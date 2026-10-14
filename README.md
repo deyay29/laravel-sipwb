@@ -30,7 +30,7 @@ Laravel 12 · Tailwind CSS 4 · MySQL · PHP 8.2+
 ## 1. Apa Itu Project Ini?
 
 Bandung Info Center adalah **website informasi publik** untuk Kota Bandung.
-Pengunjung bisa membaca berita, melihat_destinasi wisata, menjelajahi kuliner khas,
+Pengunjung bisa membaca berita, melihat destinasi wisata, menjelajahi kuliner khas,
 menyusuri sejarah kota, dan melihat galeri foto — tanpa perlu membuat akun.
 
 Selain itu ada **Panel Admin** yang dipakai pihak yang mengelola isi website
@@ -41,7 +41,7 @@ untuk menambah, mengubah, dan menghapus konten.
 | Bagian | Fitur |
 |---|---|
 | 🏠 **Beranda** | Cuaca Kota Bandung, 5 kategori utama, rekomendasi kuliner sesuai suhu |
-| 📰 **Berita** | Artikel + audio + tombol reaksi (like / apresiasi / consequentementecerah) |
+| 📰 **Berita** | Artikel + audio + tombol reaksi (like / apresiasi / cerah) |
 | 🏞️ **Wisata** | Destinasi + lokasi + harga tiket, detail per tempat |
 | 🍜 **Kuliner** | Kuliner khas dengan kategori suhu (menghangatkan / menyegarkan), difilter otomatis sesuai cuaca |
 | 🏛️ **Sejarah** | Topik sejarah yang dipecah menjadi beberapa bab (storytelling) |
@@ -130,8 +130,8 @@ git clone https://github.com/deyay29/laravel-sipwb.git
 
 Perintah ini **menyalin** seluruh isi project dari internet ke komputermu.
 Kalau muncul permintaan username/password, masukkan akun GitHub-mu.
-
-Laravel butuh folder名为 `laravel-sipwb`. Kalau project ini später diubah namanya,
+Laravel butuh folder bernama `laravel-sipwb`. Kalau nama project ini nanti diubah,
+buka `composer.json` lalu ubah nilai pada key `"name"`.
 buka `composer.json` lalu ubah nilai `"name"`.
 
 ### Langkah 4 — Masuk ke Folder Project
@@ -145,8 +145,8 @@ cd laravel-sipwb
 ```bash
 composer install
 ```
-
-Perintah ini mengunduh数百 library (pustaka kode) yang dibutuhkan project.
+Perintah ini mengunduh ratusan library (pustaka kode) yang dibutuhkan project.
+Perintah ini mengunduh ratusan library (pustaka kode) yang dibutuhkan project.
 **Butuh koneksi internet.** Prosesnya bisa memakan waktu 1–3 menit.
 
 Kalau muncul error `composer` bukan perintah / `command not found`, berarti Composer
@@ -257,7 +257,7 @@ Perintah ini membuat seluruh tabel yang dibutuhkan, mengikuti file di
 php artisan db:seed
 ```
 
-sekarang database sudah terisi data contoh: berita, wisata, kuliner, sejarah,
+Sekarang database sudah terisi data contoh: berita, wisata, kuliner, sejarah,
 galeri, smart budget, dan 2 akun user.
 
 ### Langkah 11 — Pasang Library Frontend
@@ -330,8 +330,8 @@ php artisan serve --host=0.0.0.0 --port=8000
 ```
 
 > **Hentikan server:** tekan `Ctrl + C` di terminal tempat server berjalan.
-
-### Perintah 开发 berguna
+### Perintahombo-developed Berguna
+### Perintah Develop Berguna
 
 | Tujuan | Perintah |
 |---|---|
@@ -406,8 +406,8 @@ laravel-sipwb/
 │   │   │   ├── PublicController.php   # Halaman untuk pengunjung
 │   │   │   ├── AuthController.php     # Login admin
 │   │   │   └── Admin/                 # Halaman panel admin
-│   │   └── Middleware/AdminMiddleware.php   # Penjaga panel admin
-│   ├── Models/                   # Definisi tabel (与 database)
+│   ├── Models/                   # Definisi isi tabel database
+│   ├── Models/                   # Definisi isi tabel database
 │   │   └── Concerns/HasSlug.php   # Pembuat slug otomatis
 │   ├── Services/WeatherService.php      # Ambil cuaca dari Open-Meteo
 │   └── Support/Media.php               # Resolver path gambar
@@ -480,11 +480,11 @@ layouts/app.blade.php  →  membungkus dengan navbar & footer
 | `/berita` | Daftar berita |
 | `/berita/{slug}` | Detail berita |
 | `/wisata` | Daftar wisata |
-| `/ cognizant/{slug}` | — |
+| `/wisata/{slug}` | Detail Destinasi |
 | `/kuliner` | Daftar kuliner + cuaca |
 | `/sejarah` | Daftar topik sejarah |
 | `/sejarah/{slug}` | Detail topik sejarah |
-| `/sejarah/{slug}/bab/{nomor}` | Detail satu bab |
+| `/sejarah/{slug}/bab/{nomor_bab}` | Detail satu bab |
 | `/galeri` | Galeri foto |
 | `/smart-budget` | Paket anggaran |
 | `/kontak` | Kontak & peta |
@@ -672,8 +672,8 @@ bentar
 
 ### `git push` — Mengirim ke GitHub
 
-```bash
-# Kalau sudah pernah设置 branch utama:
+# Kalau sudah pernah-determined setup branch utama:
+# Kalau branch utama sudah pernah di-*push* sebelumnya:
 git push
 
 # Kalau pertama kali / branch baru:
@@ -906,8 +906,8 @@ php artisan optimize:clear
 ```bash
 php artisan serve --port=8080
 ```
-
-### lupa从何而来
+### Lupa-change-nya dari Mana
+### Lupa Perubahan-nya dari Mana
 
 ```bash
 git status
