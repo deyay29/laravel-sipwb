@@ -22,8 +22,15 @@
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="CACHE_STORE" value="array"/>
-        <!-- <env name="DB_CONNECTION" value="sqlite"/> -->
-        <!-- <env name="DB_DATABASE" value=":memory:"/> -->
+        <!--
+            Test memakai database terpisah supaya `php artisan test`
+            tidak pernah menghapus data database pengembangan.
+
+            CREATE DATABASE `SIPWB_testing`
+                CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+        -->
+        <env name="DB_CONNECTION" value="mysql"/>
+        <env name="DB_DATABASE" value="SIPWB_testing"/>
         <env name="MAIL_MAILER" value="array"/>
         <env name="PULSE_ENABLED" value="false"/>
         <env name="QUEUE_CONNECTION" value="sync"/>

@@ -1,334 +1,240 @@
 @extends('layouts.app')
+
 @section('title', 'Beranda')
+@section('description', 'Portal Layanan Informasi Publik Kota Bandung: berita, wisata, kuliner, sejarah, dan kontak.')
 
 @section('content')
-<style>
-    /* Hero Section Override */
-    .navbar {
-        position: absolute;
-        top: 0;
-        width: 100%;
-        background: transparent;
-        border-bottom: none;
-        box-shadow: none;
-        z-index: 100;
-    }
-    .nav-links a {
-        background: white;
-        color: var(--primary);
-        border-radius: 50px;
-        padding: 0.4rem 1.2rem;
-        font-weight: 600;
-        text-decoration: none;
-    }
-    .nav-links a[href="{{ route('home') }}"] {
-        background: var(--primary);
-        color: white;
-    }
-    
-   .hero-home {
-    background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('{{ asset("images/beranda.png") }}');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    height: 80vh;
-    display: flex;
-    align-items: center;
-    position: relative;
-    color: white;
-    margin-top: -70px;
-    padding-top: 70px;
-}
+@php
+    use App\Models\Kuliner;
 
-.hero-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    gap: 2rem;
-}
-    .hero-text {
-        max-width: 600px;
-    }
-    .hero-text h1 {
-        font-size: 3rem;
-        font-weight: 700;
-        margin-bottom: 1rem;
-        color: white;
-    }
-    .hero-text p {
-        font-size: 1.2rem;
-        line-height: 1.5;
-        color: #e2e8f0;
-    }
-    .weather-widget {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    background: rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(10px);
-    padding: 1rem 1.5rem;
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    color: white;
-}
+    // $weather, $suhu, dan $suhuKategori sudah dihitung di PublicController.
+    $labelSuhu = $suhuKategori === Kuliner::SUHU_MENYEGARKAN ? 'Dingin' : 'Hangat';
+@endphp
 
-.weather-widget .weather-info h2 {
-    font-size: 1.8rem;
-    color: white;
-    margin: 0;
-    line-height: 1.1;
-}
+{{-- ============ HERO ============ --}}
+<section class="relative isolate overflow-hidden bg-navy-900">
+ <x-public.media
+ src="images/beranda.png"
+ alt=""
+ icon="fa-city"
+ tone="navy"
+ ratio="absolute inset-0 -z-20 h-full w-full"
+ class="!object-cover"
+ />
+ <div class="absolute inset-0 -z-10 bg-gradient-to-r from-navy-900/95 via-navy-800/80 to-navy-900/60"></div>
+ <div class="absolute inset-0 -z-10 bg-gradient-to-t from-navy-900/80 via-transparent to-navy-900/50"></div>
 
-.weather-widget .weather-info p {
-    font-size: 1rem;
-    margin: 0;
-    color: white;
-    opacity: 0.9;
-}
-    /* Floating Menu */
-    .floating-menu-container {
-        display: flex;
-        justify-content: center;
-        margin-top: -60px;
-        position: relative;
-        z-index: 10;
-    }
-    .floating-menu {
-        background: white;
-        border-radius: 16px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        display: flex;
-        padding: 1rem;
-        gap: 1rem;
-    }
-    .fm-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        width: 120px;
-        height: 120px;
-        border: 1px solid var(--border-color);
-        border-radius: 12px;
-        text-decoration: none;
-        color: var(--primary);
-        font-weight: 600;
-        transition: 0.3s;
-    }
-    .fm-item:hover {
-        background: var(--bg-light);
-        border-color: var(--primary);
-    }
-    .fm-item svg {
-        width: 40px;
-        height: 40px;
-        margin-bottom: 10px;
-    }
+ <div class="mx-auto flex max-w-[1400px] flex-wrap items-center gap-10 px-5 pb-40 pt-36 lg:px-8 lg:pb-44 lg:pt-44">
+ <div class="max-w-xl">
+ <p class="text-sm font-medium text-white/80">Selamat Datang di</p>
 
-    /* Section Styling */
-    .section-title {
-        color: var(--primary);
-        font-size: 1.8rem;
-        font-weight: 700;
-        margin-bottom: 1.5rem;
-    }
-    .section-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1.5rem;
-    }
-    .btn-see-all {
-        background: var(--primary);
-        color: white;
-        padding: 0.5rem 1.5rem;
-        border-radius: 25px;
-        text-decoration: none;
-        font-weight: 600;
-    }
-    
-    /* Horizontal Card List */
-    .card-list {
-        display: flex;
-        gap: 1.5rem;
-        overflow-x: auto;
-        padding-bottom: 1rem;
-    }
-    .card-item {
-        min-width: 250px;
-        border-radius: 16px;
-        overflow: hidden;
-        box-shadow: var(--shadow-md);
-        position: relative;
-        flex: 1;
-    }
-    .card-item img {
-        width: 100%;
-        height: 250px;
-        object-fit: cover;
-        display: block;
-    }
-    .card-info {
-        background: var(--primary);
-        color: white;
-        padding: 1rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    .card-info h3 {
-        margin: 0;
-        font-size: 1.1rem;
-        font-weight: 600;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        color: white;
-    }
-    .card-info span {
-        font-size: 0.8rem;
-        color: #bfdbfe;
-    }
-    
-</style>
+ <h1 class="mt-2 font-display text-4xl font-extrabold leading-tight text-white sm:text-5xl lg:text-6xl">
+ Bandung Info Center
+ </h1>
 
-<section class="hero-home">
-    <div class="container hero-content">
-        <div class="hero-text">
-            <h3 style="color:white; font-weight:normal; margin-bottom:0.5rem;">Selamat Datang di</h3>
-            <h1>Bandung Info Center</h1>
-            <p>Portal Layanan Informasi Publik Kota di Bandung untuk penyediaan informasi Wisata, Sejarah, kuliner & Berita terkini untuk wisatawan & masyarakat</p>
-        </div>
-        <div class="weather-widget">
-    <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:white;"><path d="M17.5 19a4.5 4.5 0 0 0 .5-8.97V10a6 6 0 0 0-11.83-1.42 4.00 4.00 0 0 0-1.03 7.75"></path><path d="M8 15v2"></path><path d="M8 21v2"></path><path d="M12 15v2"></path><path d="M12 21v2"></path><path d="M16 15v2"></path><path d="M16 21v2"></path></svg>
-    <div class="weather-info">
-        <h2>22°C</h2>
-        <p>Berawan</p>
-    </div>
-</div>
+ <p class="mt-5 text-base leading-relaxed text-white/85">
+ Portal Layanan Informasi Publik Kota Bandung untuk penyediaan
+ informasi Wisata, Sejarah, kuliner &amp; Berita terkini untuk
+ pengunjung &amp; masyarakat.
+ </p>
+ </div>
+
+    {{-- Kartu cuaca: komponen yang sama dipakai di halaman kuliner --}}
+    <x-public.weather-card
+        variant="glass"
+        class="ml-auto hidden w-auto lg:block"
+        :weather="$weather"
+        :rekomendasi="$suhuKategori"
+    />
+ </div>
+ </div>
+ </div>
 </section>
 
-<div class="container floating-menu-container">
-    <div class="floating-menu">
-        <a href="{{ route('public.wisata') }}" class="fm-item">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-            Wisata
-        </a>
-        <a href="{{ route('public.sejarah') }}" class="fm-item">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path></svg>
-            Sejarah
-        </a>
-        <a href="{{ route('public.berita') }}" class="fm-item">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"></path><path d="M18 14h-8"></path><path d="M15 18h-5"></path><path d="M10 6h8v4h-8V6Z"></path></svg>
-            Berita
-        </a>
-        <a href="{{ route('public.kuliner') }}" class="fm-item">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path><path d="M7 2v20"></path><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path></svg>
-            Kuliner
-        </a>
-        <a href="{{ route('public.galeri') }}" class="fm-item">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect><circle cx="9" cy="9" r="2"></circle><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path></svg>
-            Galeri
-        </a>
-    </div>
-</div>
+{{-- ============ KARTU KATEGORI (melayang di atas hero) ============ --}}
+<section class="relative z-10 mx-auto -mt-28 max-w-[1400px] px-5 lg:-mt-32 lg:px-8">
+ <div class="grid grid-cols-2 gap-4 rounded-3xl border border-slate-200 bg-white p-4 shadow-[0_20px_50px_rgba(15,23,42,0.12)] sm:grid-cols-3 lg:grid-cols-5">
+ @foreach ([
+ ['label' => 'Wisata', 'route' => 'public.wisata', 'icon' => 'fa-image', 'desc' => 'Destinasi unggulan'],
+ ['label' => 'Sejarah', 'route' => 'public.sejarah', 'icon' => 'fa-landmark', 'desc' => 'Arsip & museum'],
+ ['label' => 'Berita', 'route' => 'public.berita', 'icon' => 'fa-newspaper', 'desc' => 'Kabar terkini'],
+ ['label' => 'Kuliner', 'route' => 'public.kuliner', 'icon' => 'fa-utensils', 'desc' => 'Khas Bandung'],
+ ['label' => 'Kontak', 'route' => 'public.kontak', 'icon' => 'fa-headset', 'desc' => 'Hubungi kami'],
+ ] as $kategori)
+ <a href="{{ route($kategori['route']) }}"
+ class="group flex flex-col items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-7 transition hover:border-brand-500 hover:shadow-[0_12px_28px_rgba(37,99,235,0.16)]">
+ <span class="grid h-14 w-14 place-items-center rounded-2xl border-2 border-brand-600 text-xl text-brand-700 transition group-hover:bg-brand-600 group-hover:text-white">
+ <i class="fas {{ $kategori['icon'] }}"></i>
+ </span>
 
-<section class="container mt-5 mb-5">
-    <!-- KULINER -->
-    <div class="section-header">
-        <h2 class="section-title">Rekomendasi Kuliner</h2>
-        <a href="{{ route('public.kuliner') }}" class="btn-see-all">Lihat Semua</a>
-    </div>
-    <div class="card-list">
-        @foreach($kuliners as $kuliner)
-        <a href="{{ route('public.kuliner.show', $kuliner->slug) }}" class="card-item" style="text-decoration:none;">
-            @if($kuliner->foto)
-                <img src="{{ asset('storage/' . $kuliner->foto) }}" alt="{{ $kuliner->nama_kuliner }}">
-            @else
-                <!-- GAMBAR GEDUNG SATE DIPASANG DI SINI SEBAGAI PENGGANTI -->
-                <img src="{{ asset('images/beranda.png') }}" alt="Gedung Sate Bandung">
-            @endif
-            <div class="card-info">
-                <div>
-                    <h3>{{ $kuliner->nama_kuliner }}</h3>
-                    <span>Detail</span>
-                </div>
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:white;"><path d="m9 18 6-6-6-6"/></svg>
-            </div>
-        </a>
-        @endforeach
-    </div>
-    <!-- WISATA -->
-    <div class="section-header mt-5">
-        <h2 class="section-title">Destinasi Wisata Populer</h2>
-        <a href="{{ route('public.wisata') }}" class="btn-see-all">Lihat Semua</a>
-    </div>
-    <div class="card-list">
-        @foreach($wisatas as $wisata)
-        <a href="{{ route('public.wisata.show', $wisata->slug) }}" class="card-item" style="text-decoration:none;">
-            @if($wisata->gambar)
-                <img src="{{ asset('storage/' . $wisata->gambar) }}" alt="{{ $wisata->nama_wisata }}">
-            @else
-                <img src="https://images.unsplash.com/photo-1555899434-94d1368aa7af?q=80&w=600&auto=format&fit=crop" alt="Wisata">
-            @endif
-            <div class="card-info">
-                <div>
-                    <h3>{{ $wisata->nama_wisata }}</h3>
-                    <span>Detail</span>
-                </div>
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:white;"><path d="m9 18 6-6-6-6"/></svg>
-            </div>
-        </a>
-        @endforeach
-    </div>
+ <span class="text-center">
+ <span class="block font-display text-sm font-bold text-slate-900">{{ $kategori['label'] }}</span>
+ <span class="mt-0.5 block text-[11px] text-slate-400">{{ $kategori['desc'] }}</span>
+ </span>
+ </a>
+ @endforeach
+ </div>
+</section>
 
-    <!-- BERITA -->
-    <div class="section-header mt-5">
-        <h2 class="section-title">Berita Terkini</h2>
-        <a href="{{ route('public.berita') }}" class="btn-see-all">Lihat Semua</a>
-    </div>
-    <div class="card-list">
-        @foreach($beritas as $berita)
-        <a href="{{ route('public.berita.show', $berita->slug) }}" class="card-item" style="text-decoration:none;">
-            @if($berita->gambar)
-                <img src="{{ asset('storage/' . $berita->gambar) }}" alt="{{ $berita->judul }}">
-            @else
-                <img src="https://images.unsplash.com/photo-1585829365295-ab7cd400c167?q=80&w=600&auto=format&fit=crop" alt="Berita">
-            @endif
-            <div class="card-info">
-                <div>
-                    <h3>{{ $berita->judul }}</h3>
-                    <span>Detail</span>
-                </div>
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:white;"><path d="m9 18 6-6-6-6"/></svg>
-            </div>
-        </a>
-        @endforeach
-    </div>
+{{-- ============ REKOMENDASI KULINER ============ --}}
+<section class="mx-auto max-w-[1400px] px-5 py-16 lg:px-8">
+    <x-public.section-header
+        title="Rekomendasi Kuliner"
+        highlight="(Berdasarkan Suhu {{ $labelSuhu }})"
+        :description="$suhu !== null ? 'Suhu saat ini '.$suhu.'°C, rekomendasi dipilih otomatis.' : 'Data cuaca belum tersedia, rekomendasi memakai kategori standar.'"
+        :action="route('public.kuliner')"
+        action-label="Lihat Semua"
+    />
 
-    <!-- SEJARAH -->
-    <div class="section-header mt-5">
-        <h2 class="section-title">Jelajahi Sejarah</h2>
-        <a href="{{ route('public.sejarah') }}" class="btn-see-all">Lihat Semua</a>
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        @forelse ($kuliners as $kuliner)
+            <x-public.content-card
+                variant="brand"
+                :href="route('public.kuliner.show', $kuliner)"
+                :src="$kuliner->foto"
+                :image-alt="$kuliner->nama_kuliner"
+                image-icon="fa-utensils"
+                image-tone="amber"
+                :badge="$kuliner->kategori_suhu"
+                badge-tone="bg-white/20 text-white"
+                :title="$kuliner->nama_kuliner"
+                :summary="Str::limit($kuliner->deskripsi, 70)"
+                :meta="[[$kuliner->jam_operasional ? 'far fa-clock' : null, $kuliner->jam_operasional ?? '-']]"
+                :note="$kuliner->harga ? 'Rp'.number_format($kuliner->harga, 0, ',', '.') : null"
+            />
+        @empty
+            <x-public.empty-state
+                class="sm:col-span-2 lg:col-span-4"
+                title="Belum ada rekomendasi kuliner"
+                description="Kuliner dengan kategori suhu ini belum tersedia."
+                icon="fa-utensils"
+            />
+        @endforelse
     </div>
-    <div class="card-list">
-        @foreach($sejarahs as $sejarah)
-        <a href="{{ route('public.sejarah.show', $sejarah->slug) }}" class="card-item" style="text-decoration:none;">
-            @if($sejarah->gambar_utama)
-                <img src="{{ asset('storage/' . $sejarah->gambar_utama) }}" alt="{{ $sejarah->judul_topik }}">
-            @else
-                <img src="https://images.unsplash.com/photo-1599930113854-d6d7fd521f10?q=80&w=600&auto=format&fit=crop" alt="Sejarah">
-            @endif
-            <div class="card-info">
-                <div>
-                    <h3>{{ $sejarah->judul_topik }}</h3>
-                    <span>Detail</span>
-                </div>
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:white;"><path d="m9 18 6-6-6-6"/></svg>
-            </div>
-        </a>
-        @endforeach
+</section>
+
+{{-- ============ BERITA TERBARU ============ --}}
+<section class="bg-white py-16">
+    <div class="mx-auto max-w-[1400px] px-5 lg:px-8">
+        <x-public.section-header
+            title="Berita Terbaru"
+            description="Kabar terkini dari Kota Bandung."
+            :action="route('public.berita')"
+            action-label="Lihat Semua"
+        />
+
+        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            @forelse ($beritas as $berita)
+                <x-public.content-card
+                    :href="route('public.berita.show', $berita)"
+                    :src="$berita->gambar"
+                    :image-alt="$berita->judul"
+                    image-icon="fa-newspaper"
+                    image-tone="brand"
+                    :badge="$berita->kategori"
+                    :title="$berita->judul"
+                    :meta="[
+                        ['far fa-calendar', $berita->tanggal?->format('d M Y') ?? '-'],
+                        ['far fa-eye', number_format($berita->visitor_count, 0, ',', '.')],
+                    ]"
+                />
+            @empty
+                <x-public.empty-state
+                    class="sm:col-span-2 lg:col-span-4"
+                    title="Belum ada berita"
+                    icon="fa-newspaper"
+                />
+            @endforelse
+        </div>
     </div>
+</section>
+
+{{-- ============ WISATA PILIHAN ============ --}}
+<section class="mx-auto max-w-[1400px] px-5 py-16 lg:px-8">
+    <x-public.section-header
+        title="Wisata Pilihan"
+        description="Destinasi ikonik dari seluruh penjuru kota."
+        :action="route('public.wisata')"
+        action-label="Lihat Semua"
+    />
+
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        @forelse ($wisatas as $wisata)
+            <x-public.content-card
+                :href="route('public.wisata.show', $wisata)"
+                :src="$wisata->gambar"
+                :image-alt="$wisata->nama_wisata"
+                image-icon="fa-mountain-sun"
+                image-tone="emerald"
+                :badge="$wisata->kategori"
+                badge-tone="bg-emerald-50 text-emerald-700"
+                :title="$wisata->nama_wisata"
+                :summary="Str::limit($wisata->deskripsi, 80)"
+                :meta="[['fas fa-location-dot', $wisata->lokasi ?? 'Bandung']]"
+                :note="$wisata->harga_tiket ? 'Rp'.number_format($wisata->harga_tiket, 0, ',', '.') : 'Gratis'"
+            />
+        @empty
+            <x-public.empty-state
+                class="sm:col-span-2 lg:col-span-4"
+                title="Belum ada data wiselyat"
+                icon="fa-mountain-sun"
+            />
+        @endforelse
+    </div>
+</section>
+
+{{-- ============ SEJARAH ============ --}}
+<section class="bg-navy-800 py-16">
+    <div class="mx-auto max-w-[1400px] px-5 lg:px-8">
+        <x-public.section-header
+            tone="dark"
+            title="Cerita Sejarah"
+            description="Telusuri tonggak perjalanan Kota Bandung."
+            :action="route('public.sejarah')"
+            action-label="Lihat Semua"
+        />
+
+        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            @forelse ($sejarahs as $topik)
+                <x-public.content-card
+                    variant="dark"
+                    :href="route('public.sejarah.show', $topik)"
+                    :src="$topik->gambar_utama"
+                    :image-alt="$topik->judul_topik"
+                    image-icon="fa-landmark"
+                    image-tone="violet"
+                    badge="{{ $topik->babs_count }} bab"
+                    badge-tone="bg-white/15 text-white"
+                    :title="$topik->judul_topik"
+                    :summary="Str::limit($topik->ringkasan, 80)"
+                    :meta="[['far fa-calendar', $topik->created_at->format('d M Y')]]"
+                />
+            @empty
+                <x-public.empty-state
+                    class="sm:col-span-2 lg:col-span-4 !border-white/20 !bg-white/5"
+                    title="Belum ada topik sejarah"
+                    icon="fa-landmark"
+                />
+            @endforelse
+        </div>
+    </div>
+</section>
+
+{{-- ============ SMART BUDGET ============ --}}
+<section class="mx-auto max-w-[1400px] px-5 py-16 lg:px-8">
+ <div class="flex flex-wrap items-center justify-between gap-6 rounded-3xl border border-slate-200 bg-white p-8 shadow-[0_2px_16px_rgba(15,23,42,0.06)] lg:p-12">
+ <div class="max-w-xl">
+ <h2 class="font-display text-2xl font-extrabold text-slate-900">Rencanakan liburan hemat</h2>
+ <p class="mt-2 text-sm leading-relaxed text-slate-600">
+ Gunakan paket Smart Budget untuk menghitung perkiraan biaya trip Bandung sebelum berangkat.
+ </p>
+ </div>
+
+ <a href="{{ route('public.smart-budget') }}"
+ class="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-navy-800 to-brand-600 px-8 py-4 font-display text-sm font-bold text-white transition hover:shadow-xl">
+ Buka Smart Budget
+ <i class="fas fa-wallet text-xs"></i>
+ </a>
+ </div>
 </section>
 @endsection

@@ -2,69 +2,55 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use App\Models\User;
+use Illuminate\Validation\ValidationException;
 
+/**
+ * Autentikasi tunggal untuk admin.
+ *
+ * Portal publik tidak memiliki login maupun pendaftaran, jadi tidak ada
+ * halaman auth yang terduplikasi.
+ */
 class AuthController extends Controller
 {
-    public function showLogin()
-    {
-        return view('auth.login');
-    }
-
-    public function login(Request $request)
+    public function login(Request $request): RedirectResponse
     {
         $credentials = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
+            'email' => ['required', 'email'],
+            'password' => ['required'],
         ]);
 
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
-            
-            if (Auth::user()->role === 'admin') {
-                return redirect()->route('admin.dashboard');
-            }
-            return redirect()->route('home');
+        if (! Auth::attempt($credentials, $request->boolean('remember'))) {
+            throw ValidationException::withMessages([
+                'email' => 'Email atau password tidak cocok dengan data kami.',
+            ]);
         }
 
-        return back()->withErrors([
-            'email' => 'The provided credentials do not match our records.',
-        ])->onlyInput('email');
+        // Hanya admin yang boleh masuk ke portal ini.
+        if (! Auth::user()->isAdmin()) {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            throw ValidationException::withMessages([
+                'email' => 'Akun ini tidak memiliki akses admin.',
+            ]);
+        }
+
+        $request->session()->regenerate();
+
+        return redirect()->intended(route('admin.dashboard'));
     }
 
-    public function showRegister()
-    {
-        return view('auth.register');
-    }
-
-    public function register(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-        ]);
-
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => 'user', // Default role
-        ]);
-
-        Auth::login($user);
-
-        return redirect()->route('home');
-    }
-
-    public function logout(Request $request)
+    public function logout(Request $request): RedirectResponse
     {
         Auth::logout();
+
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect('/');
+
+        return redirect()->route('home');
     }
 }

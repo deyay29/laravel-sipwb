@@ -2,157 +2,245 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Wisata;
-use App\Models\Sejarah; // Mengarah ke tabel sejarah_topik
-use App\Models\SejarahBab;
-use App\Models\Kuliner;
 use App\Models\Berita;
-use App\Models\ReaksiBerita;
-use App\Models\SmartBudgetPaket;
-use App\Models\Galeri;
 use App\Models\Contact;
+use App\Models\Galeri;
+use App\Models\Kuliner;
+use App\Models\ReaksiBerita;
+use App\Models\Sejarah;
+use App\Models\SmartBudgetPaket;
+use App\Models\Wisata;
+use App\Services\WeatherService;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class PublicController extends Controller
 {
-    // ==========================================
-    // 0. HOME & PROFIL
-    // ==========================================
-    public function home()
+    /**
+     * Beranda: ringkasan empat kategori konten.
+     */
+    public function home(WeatherService $weather): View
     {
-        $wisatas = Wisata::latest()->take(4)->get();
-        $beritas = Berita::latest()->take(4)->get();
-        $kuliners = Kuliner::latest()->take(5)->get();
-        $sejarahs = Sejarah::latest()->take(4)->get();
-        return view('public.home', compact('wisatas', 'beritas', 'kuliners', 'sejarahs'));
+        $weather = $weather->current();
+        $suhu = $weather['temp'] ?? null;
+
+        // Rekomendasi kuliner mengikuti suhu: >= 27°C menyegarkan, di bawahnya menghangatkan.
+        $suhuKategori = $this->suhuRekomendasi($suhu);
+
+        return view('public.home', [
+            // Jumlah item dan kolom grid sengaja dibuat sama (4) untuk semua
+            // section, agar ukuran setiap card di beranda identik.
+            'wisatas' => Wisata::latest()->take(4)->get(),
+            'beritas' => Berita::latest('tanggal')->take(4)->get(),
+            'sejarahs' => Sejarah::latest()->take(4)->get(),
+            'kuliners' => $this->rekomendasiKuliner($suhuKategori),
+
+            'weather' => $weather,
+            'suhu' => $suhu,
+            'suhuKategori' => $suhuKategori,
+        ]);
     }
 
-
-    // ==========================================
-    // 1. KULINER (Dengan Filter Suhu Cuaca)
-    // ==========================================
-    public function kuliner(Request $request)
+    /**
+     * Kategori suhu yang disarankan untuk cuaca saat ini.
+     *
+     * >= 27°C -> Menyegarkan, di bawahnya -> Menghangatkan.
+     * Tanpa data cuaca, default ke Menghangatkan.
+     */
+    private function suhuRekomendasi(?int $suhu): string
     {
-        $query = Kuliner::where('status', 'Aktif');
+        return $suhu === null || $suhu >= 27
+            ? Kuliner::SUHU_MENYEGARKAN
+            : Kuliner::SUHU_MENGHANGATKAN;
+    }
 
-        // Logika Filter Suhu Cuaca
-        if ($request->has('suhu') && in_array($request->suhu, ['Menghangatkan', 'Menyegarkan'])) {
-            $query->where('kategori_suhu', $request->suhu);
+    /**
+     * Rekomendasi kuliner sesuai suhu, maksimal 4 item.
+     *
+     * Bila kategori sesuai terlalu sedikit, sisanya dilengkapi dengan kuliner
+     * aktif lainnya supaya section di beranda tidak terlihat kosong.
+     *
+     * @return Collection<int, Kuliner>
+     */
+    private function rekomendasiKuliner(string $suhuKategori, int $limit = 4)
+    {
+        $recommended = Kuliner::aktif()
+            ->where('kategori_suhu', $suhuKategori)
+            ->latest()
+            ->take($limit)
+            ->get();
+
+        if ($recommended->count() >= $limit) {
+            return $recommended;
         }
 
-        $kuliners = $query->latest()->paginate(10);
-        return view('public.kuliner', compact('kuliners'));
+        $pelengkap = Kuliner::aktif()
+            ->when(
+                $recommended->isNotEmpty(),
+                fn ($query) => $query->whereNotIn('id_kuliner', $recommended->modelKeys())
+            )
+            ->latest()
+            ->take($limit - $recommended->count())
+            ->get();
+
+        return $recommended->concat($pelengkap);
     }
 
-    public function kulinerShow($slug)
+    /**
+     * Halaman kontak / profil organisasi.
+     */
+    public function kontak(): View
     {
-        $kuliner = Kuliner::where('slug', $slug)->where('status', 'Aktif')->firstOrFail();
-        return view('public.kuliner_show', compact('kuliner'));
+        return view('public.kontak', ['contact' => Contact::instance()]);
     }
 
     // ==========================================
-    // 2. BERITA (Dengan Audio & Reaksi)
+    // KULINER (Dengan Filter Suhu Cuaca)
     // ==========================================
-    public function berita()
+
+    public function kuliner(Request $request, WeatherService $weather): View
+    {
+        $weather = $weather->current();
+        $suhu = $weather['temp'] ?? null;
+
+        // Kategori yang paling cocok dengan cuaca saat ini.
+        $suhuRekomendasi = $this->suhuRekomendasi($suhu);
+
+        $suhuDipilih = $request->filled('suhu')
+            && in_array($request->suhu, Kuliner::suhuOptions(), true)
+                ? $request->suhu
+                : $suhuRekomendasi;
+
+        $query = Kuliner::aktif();
+
+        // Filter hanya dipakai bila memang ada nilainya di query string,
+        // supaya halaman tanpa filter tetap menampilkan semua kuliner.
+        if ($request->filled('suhu')) {
+            $query->where('kategori_suhu', $suhuDipilih);
+        }
+
+        $kuliners = $query->latest()->paginate(10)->withQueryString();
+
+        return view('public.kuliner.index', [
+            'kuliners' => $kuliners,
+            'weather' => $weather,
+            'suhu' => $suhu,
+            'suhuRekomendasi' => $suhuRekomendasi,
+            'suhuDipilih' => $suhuDipilih,
+            'suhuAktif' => $request->filled('suhu'),
+        ]);
+    }
+
+    public function kulinerShow(Kuliner $kuliner): View
+    {
+        abort_unless($kuliner->status === Kuliner::STATUS_AKTIF, 404);
+
+        return view('public.kuliner.show', compact('kuliner'));
+    }
+
+    // ==========================================
+    // BERITA (Dengan Audio & Reaksi)
+    // ==========================================
+
+    public function berita(): View
     {
         $beritas = Berita::latest('tanggal')->paginate(10);
-        return view('public.berita', compact('beritas'));
+
+        return view('public.berita.index', compact('beritas'));
     }
 
-    public function beritaShow($slug)
+    public function beritaShow(Berita $berita): View
     {
-        $berita = Berita::where('slug', $slug)->firstOrFail();
-        
-        // Logika View Counter
         $berita->increment('visitor_count');
-        
-        // Mengambil tabel reaksi (buat record baru jika belum ada)
-        $reaksi = ReaksiBerita::firstOrCreate(
-            ['id_berita' => $berita->id_berita],
-            ['like_count' => 0, 'applause_count' => 0, 'insightful_count' => 0]
-        );
-        
-        return view('public.berita_show', compact('berita', 'reaksi'));
+
+        // Satu berita hanya boleh punya satu baris reaksi.
+        $reaksi = ReaksiBerita::firstOrCreate(['id_berita' => $berita->id_berita]);
+
+        return view('public.berita.show', compact('berita', 'reaksi'));
     }
 
-    public function beritaReact(Request $request, $id_berita)
+    /**
+     * Dipakai oleh request AJAX dari tombol reaksi di halaman detail.
+     */
+    public function beritaReact(Request $request, Berita $berita)
     {
-        // Digunakan untuk request via AJAX/Fetch API dari Frontend
-        $request->validate([
-            'tipe_reaksi' => 'required|in:like,applause,insightful'
+        $validated = $request->validate([
+            'tipe_reaksi' => ['required', 'in:'.implode(',', Berita::REAKSI_TIPE)],
         ]);
 
-        $reaksi = ReaksiBerita::where('id_berita', $id_berita)->firstOrFail();
-        $kolom = $request->tipe_reaksi . '_count';
-        
-        // Tambahkan +1 pada reaksi yang diklik
-        $reaksi->increment($kolom);
+        $reaksi = ReaksiBerita::firstOrCreate(['id_berita' => $berita->id_berita]);
+        $reaksi->incrementReaksi($validated['tipe_reaksi']);
 
         return response()->json([
             'status' => 'success',
             'message' => 'Reaksi berhasil disimpan!',
-            'data' => $reaksi
+            'data' => $reaksi->fresh(),
         ]);
     }
 
     // ==========================================
-    // 3. WISATA & SMART BUDGET
+    // WISATA & SMART BUDGET
     // ==========================================
-    public function wisata()
+
+    public function wisata(): View
     {
         $wisatas = Wisata::latest()->paginate(12);
-        return view('public.wisata', compact('wisatas'));
+
+        return view('public.wisata.index', compact('wisatas'));
     }
 
-    public function wisataShow($slug)
+    public function wisataShow(Wisata $wisata): View
     {
-        $wisata = Wisata::where('slug', $slug)->firstOrFail();
-        return view('public.wisata_show', compact('wisata'));
+        return view('public.wisata.show', compact('wisata'));
     }
 
-    public function smartBudgetIndex()
+    public function smartBudgetIndex(): View
     {
-        $pakets = SmartBudgetPaket::all();
-        return view('public.smart_budget', compact('pakets'));
+        $pakets = SmartBudgetPaket::orderBy('total_estimasi')->get();
+
+        return view('public.smart-budget.index', compact('pakets'));
     }
 
     // ==========================================
-    // 4. SEJARAH & STORYTELLING PER BAB
+    // SEJARAH & STORYTELLING PER BAB
     // ==========================================
-    public function sejarah()
+
+    public function sejarah(): View
     {
         $sejarahs = Sejarah::latest()->paginate(10);
-        return view('public.sejarah', compact('sejarahs'));
+
+        return view('public.sejarah.index', compact('sejarahs'));
     }
 
-    public function sejarahShow($slug)
+    public function sejarahShow(Sejarah $topik): View
     {
-        $topik = Sejarah::where('slug', $slug)->firstOrFail();
-        $babs = $topik->babs()->orderBy('nomor_bab', 'asc')->get();
-        
-        return view('public.sejarah_show', compact('topik', 'babs'));
+        $babs = $topik->babs;
+
+        return view('public.sejarah.show', compact('topik', 'babs'));
     }
 
-    public function sejarahBabDetail($slug, $nomor_bab)
+    public function sejarahBabDetail(Sejarah $topik, string $nomorBab): View
     {
-        $topik = Sejarah::where('slug', $slug)->firstOrFail();
-        $bab = $topik->babs()->where('nomor_bab', $nomor_bab)->firstOrFail();
+        $bab = $topik->babs()->where('nomor_bab', (int) $nomorBab)->firstOrFail();
 
-        return view('public.sejarah_chapter', compact('topik', 'bab'));
+        return view('public.sejarah.chapter', compact('topik', 'bab'));
     }
 
     // ==========================================
-    // 5. GALERI (Repository Visual)
+    // GALERI (Repository Visual)
     // ==========================================
-    public function galeriIndex(Request $request)
+
+    public function galeriIndex(Request $request): View
     {
         $query = Galeri::query();
 
-        if ($request->has('kategori') && !empty($request->kategori)) {
+        if ($request->filled('kategori')) {
             $query->where('kategori_objek', $request->kategori);
         }
 
-        $galeris = $query->latest()->paginate(16);
-        return view('public.galeri', compact('galeris'));
+        $galeris = $query->latest()->paginate(16)->withQueryString();
+
+        return view('public.galeri.index', compact('galeris'));
     }
 }

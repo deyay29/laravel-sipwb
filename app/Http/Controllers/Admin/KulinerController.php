@@ -3,60 +3,75 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Kuliner;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class KulinerController extends Controller
 {
-    public function index()
+    public function index(): View
     {
-        $kuliners = Kuliner::latest()->paginate(10);
+        $kuliners = Kuliner::with('user')->latest()->paginate(10);
+
         return view('admin.kuliner.index', compact('kuliners'));
     }
 
-    public function create()
+    public function create(): View
     {
         return view('admin.kuliner.form');
     }
 
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required',
-            'image_url' => 'nullable|url',
-            'location' => 'nullable|string'
-        ]);
+        $validated = $request->validate($this->rules());
 
-        Kuliner::create($validated);
-        return redirect()->route('admin.kuliner.index')->with('success', 'Kuliner created successfully.');
+        Kuliner::create($validated + ['id_user' => $request->user()->id]);
+
+        return redirect()
+            ->route('admin.kuliner.index')
+            ->with('success', 'Kuliner berhasil ditambahkan.');
     }
 
-    public function show(string $id) { }
-
-    public function edit(string $id)
+    public function edit(Kuliner $kuliner): View
     {
-        $kuliner = Kuliner::findOrFail($id);
         return view('admin.kuliner.form', compact('kuliner'));
     }
 
-    public function update(Request $request, string $id)
+    public function update(Request $request, Kuliner $kuliner): RedirectResponse
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required',
-            'image_url' => 'nullable|url',
-            'location' => 'nullable|string'
-        ]);
+        $validated = $request->validate($this->rules());
 
-        $kuliner = Kuliner::findOrFail($id);
+        $validated['id_user'] = $request->user()->id;
+
         $kuliner->update($validated);
-        return redirect()->route('admin.kuliner.index')->with('success', 'Kuliner updated successfully.');
+
+        return redirect()
+            ->route('admin.kuliner.index')
+            ->with('success', 'Kuliner berhasil diperbarui.');
     }
 
-    public function destroy(string $id)
+    public function destroy(Kuliner $kuliner): RedirectResponse
     {
-        Kuliner::findOrFail($id)->delete();
-        return redirect()->route('admin.kuliner.index')->with('success', 'Kuliner deleted successfully.');
+        $kuliner->delete();
+
+        return redirect()
+            ->route('admin.kuliner.index')
+            ->with('success', 'Kuliner berhasil dihapus.');
+    }
+
+    protected function rules(): array
+    {
+        return [
+            'nama_kuliner' => ['required', 'string', 'max:255'],
+            'kategori_suhu' => ['nullable', 'in:'.Kuliner::SUHU_MENGHANGATKAN.','.Kuliner::SUHU_MENYEGARKAN],
+            'harga' => ['nullable', 'integer', 'min:0'],
+            'jam_operasional' => ['nullable', 'string', 'max:100'],
+            'kontak' => ['nullable', 'string', 'max:100'],
+            'alamat_lengkap' => ['nullable', 'string'],
+            'deskripsi' => ['required', 'string'],
+            'foto' => ['nullable', 'string', 'max:255'],
+            'status' => ['required', 'in:'.Kuliner::STATUS_AKTIF.','.Kuliner::STATUS_NONAKTIF],
+        ];
     }
 }

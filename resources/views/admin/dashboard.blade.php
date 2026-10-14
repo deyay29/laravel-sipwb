@@ -1,500 +1,202 @@
 @extends('layouts.admin')
 
-@section('title', 'Dashboard Admin')
-@section('topbar-title', 'Dashboard Admin')
+@section('title', 'Dashboard')
+@section('topbar-title', 'Dashboard')
 
 @section('content')
-<style>
-    /* ===== DASHBOARD PAGE STYLES ===== */
+@php
+ use App\Services\WeatherService;
 
-    /* ---- Header ---- */
-    .dash-header {
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        margin-bottom: 26px;
-        flex-wrap: wrap;
-        gap: 14px;
-        animation: fadeSlideDown 0.5s ease both;
-    }
-    .dash-welcome h1 {
-        font-size: 28px;
-        font-weight: 800;
-        color: #1e293b;
-        line-height: 1.2;
-        letter-spacing: -0.3px;
-    }
-    .dash-welcome p {
-        margin-top: 6px;
-        font-size: 14px;
-        color: #64748b;
-        font-weight: 400;
-    }
-    .btn-manage-kuliner {
-        display: inline-flex;
-        align-items: center;
-        gap: 9px;
-        padding: 12px 24px;
-        background: linear-gradient(135deg, #1a2a6c 0%, #2d4cc8 100%);
-        color: #fff;
-        border-radius: 14px;
-        font-size: 14px;
-        font-weight: 600;
-        text-decoration: none;
-        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 4px 18px rgba(26,42,108,0.30);
-        white-space: nowrap;
-        letter-spacing: 0.1px;
-    }
-    .btn-manage-kuliner:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 28px rgba(26,42,108,0.40);
-        color: #fff;
-    }
-    .btn-manage-kuliner i { transition: transform 0.2s; }
-    .btn-manage-kuliner:hover i { transform: translateX(4px); }
+ $temp = $weather['temp'] ?? null;
+ $condition = $weather['condition'] ?? 'Data cuaca tidak tersedia';
+ $updatedAt = $weather['time'] ?? now()->format('H:i');
+ $humidity = $weather['humidity'] ?? null;
+    $region = $weather['region'] ?? 'Bandung';
 
-    /* ---- Weather Card ---- */
-    .weather-card {
-        background: linear-gradient(130deg, #1a2a6c 0%, #2541a0 55%, #1e63c9 100%);
-        border-radius: 20px;
-        padding: 26px 30px 20px;
-        color: #fff;
-        margin-bottom: 22px;
-        position: relative;
-        overflow: hidden;
-        box-shadow: 0 8px 32px rgba(26,42,108,0.28);
-        animation: fadeSlideDown 0.5s 0.08s ease both;
-    }
-    .weather-card::before {
-        content: '';
-        position: absolute;
-        top: -50px; right: -50px;
-        width: 200px; height: 200px;
-        background: rgba(255,255,255,0.06);
-        border-radius: 50%;
-        pointer-events: none;
-    }
-    .weather-card::after {
-        content: '';
-        position: absolute;
-        bottom: -70px; right: 100px;
-        width: 250px; height: 250px;
-        background: rgba(255,255,255,0.04);
-        border-radius: 50%;
-        pointer-events: none;
-    }
-    .weather-top {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 16px;
-        flex-wrap: wrap;
-        gap: 12px;
-        position: relative;
-        z-index: 1;
-    }
-    .weather-main {
-        display: flex;
-        align-items: center;
-        gap: 20px;
-    }
-    .weather-icon-wrap {
-        width: 64px; height: 64px;
-        background: rgba(255,255,255,0.14);
-        border-radius: 18px;
-        display: flex; align-items: center; justify-content: center;
-        font-size: 32px;
-        backdrop-filter: blur(4px);
-        border: 1px solid rgba(255,255,255,0.18);
-        flex-shrink: 0;
-    }
-    .weather-temp {
-        font-size: 46px;
-        font-weight: 800;
-        line-height: 1;
-        letter-spacing: -1px;
-    }
-    .weather-location {
-        font-size: 14px;
-        color: rgba(255,255,255,0.70);
-        margin-top: 5px;
-        font-weight: 400;
-    }
-    .weather-right {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        gap: 9px;
-    }
-    .btn-refresh {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 9px 18px;
-        background: rgba(255,255,255,0.16);
-        border: 1px solid rgba(255,255,255,0.28);
-        border-radius: 11px;
-        color: #fff;
-        font-size: 13px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.2s;
-        text-decoration: none;
-        font-family: 'Inter', sans-serif;
-        backdrop-filter: blur(4px);
-        letter-spacing: 0.2px;
-    }
-    .btn-refresh:hover {
-        background: rgba(255,255,255,0.26);
-        color: #fff;
-        transform: scale(1.04);
-    }
-    .btn-refresh i {
-        font-size: 12px;
-        animation: spin 3s linear infinite;
-    }
-    @keyframes spin {
-        from { transform: rotate(0deg); }
-        to   { transform: rotate(360deg); }
-    }
-    .weather-source {
-        font-size: 11.5px;
-        color: rgba(255,255,255,0.45);
-    }
-    .weather-footer {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding-top: 15px;
-        border-top: 1px solid rgba(255,255,255,0.12);
-        flex-wrap: wrap;
-        gap: 10px;
-        position: relative;
-        z-index: 1;
-    }
-    .weather-meta {
-        display: flex;
-        align-items: center;
-        gap: 22px;
-        flex-wrap: wrap;
-    }
-    .weather-meta-item {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 13px;
-        color: rgba(255,255,255,0.78);
-        font-weight: 500;
-    }
-    .weather-meta-item i { font-size: 13px; color: rgba(255,255,255,0.55); }
+ // Ikon cuaca memakai FontAwesome, sama seperti ikon lain di aplikasi.
+ $weatherIcon = WeatherService::icon($weather);
 
-    /* ---- Stats Grid ---- */
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 16px;
-        margin-bottom: 18px;
-    }
-    .stat-card {
-        background: #fff;
-        border-radius: 18px;
-        padding: 22px 22px 18px;
-        box-shadow: 0 2px 16px rgba(0,0,0,0.045);
-        transition: transform 0.22s cubic-bezier(0.4,0,0.2,1), box-shadow 0.22s;
-        cursor: default;
-        border: 1px solid rgba(0,0,0,0.04);
-        animation: fadeSlideUp 0.45s ease both;
-    }
-    .stat-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 12px 32px rgba(0,0,0,0.10);
-    }
-    .stat-icon-wrap {
-        width: 46px; height: 46px;
-        border-radius: 13px;
-        display: flex; align-items: center; justify-content: center;
-        font-size: 20px;
-        margin-bottom: 16px;
-        transition: transform 0.2s;
-    }
-    .stat-card:hover .stat-icon-wrap { transform: scale(1.1); }
-    .stat-value {
-        font-size: 36px;
-        font-weight: 800;
-        color: #1e293b;
-        line-height: 1;
-        margin-bottom: 7px;
-        letter-spacing: -1px;
-        font-variant-numeric: tabular-nums;
-    }
-    .stat-label {
-        font-size: 11px;
-        font-weight: 700;
-        color: #94a3b8;
-        letter-spacing: 1.1px;
-        text-transform: uppercase;
-    }
+ // Rekomendasi kategori kuliner berdasarkan suhu saat ini.
+ $tempCategory = $temp !== null && $temp >= 27 ? 'Menyegarkan' : 'Menghangatkan';
 
-    /* Color variants */
-    .icon-blue   { background: #e8f0fe; color: #4285f4; }
-    .icon-green  { background: #e6f9f0; color: #34a853; }
-    .icon-orange { background: #fff3e0; color: #f5a623; }
-    .icon-purple { background: #f3e8ff; color: #9b59b6; }
-    .icon-teal   { background: #e0f5f5; color: #0097a7; }
-    .icon-red    { background: #ffe8e8; color: #e53935; }
-    .icon-pink   { background: #fce4ec; color: #e91e63; }
-    .icon-gray   { background: #f0f2f5; color: #546e7a; }
+ $stats = [
+ [
+ 'label' => 'Total Kuliner',
+ 'value' => $counts['kuliner_total'],
+ 'icon' => 'fa-screwdriver-wrench',
+ 'tone' => 'blue',
+ 'url' => route('admin.kuliner.index'),
+ ],
+ [
+ 'label' => 'Kuliner Aktif',
+ 'value' => $counts['kuliner_aktif'],
+ 'icon' => 'fa-circle-check',
+ 'tone' => 'green',
+ 'url' => route('admin.kuliner.index'),
+ ],
+ [
+ 'label' => 'Kuliner Nonaktif',
+ 'value' => $counts['kuliner_nonaktif'],
+ 'icon' => 'fa-circle-pause',
+ 'tone' => 'amber',
+ 'url' => route('admin.kuliner.index'),
+ ],
+ [
+ 'label' => 'Wisata',
+ 'value' => $counts['wisata'],
+ 'icon' => 'fa-mountain-sun',
+ 'tone' => 'violet',
+ 'url' => route('admin.wisata.index'),
+ ],
+ [
+ 'label' => 'Berita',
+ 'value' => $counts['berita'],
+ 'icon' => 'fa-newspaper',
+ 'tone' => 'sky',
+ 'url' => route('admin.berita.index'),
+ ],
+ [
+ 'label' => 'Topik Sejarah',
+ 'value' => $counts['sejarah'],
+ 'icon' => 'fa-landmark',
+ 'tone' => 'rose',
+ 'url' => route('admin.sejarah.index'),
+ ],
+ ];
+@endphp
 
-    /* ---- Info Cards (bottom) ---- */
-    .info-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 16px;
-        animation: fadeSlideUp 0.5s 0.38s ease both;
-    }
-    .info-card {
-        background: #fff;
-        border-radius: 18px;
-        padding: 24px 26px;
-        box-shadow: 0 2px 16px rgba(0,0,0,0.045);
-        border: 1px solid rgba(0,0,0,0.04);
-    }
-    .info-card h3 {
-        font-size: 15px;
-        font-weight: 700;
-        color: #1e293b;
-        margin-bottom: 13px;
-        display: flex;
-        align-items: center;
-        gap: 9px;
-    }
-    .info-card p, .info-card li {
-        font-size: 13.5px;
-        color: #475569;
-        line-height: 1.75;
-    }
-    .info-card ul { list-style: none; }
-    .info-card ul li {
-        padding: 7px 0;
-        border-bottom: 1px solid #f1f5f9;
-        display: flex;
-        align-items: flex-start;
-        gap: 10px;
-    }
-    .info-card ul li:last-child { border-bottom: none; }
-    .info-card ul li::before {
-        content: '•';
-        color: #cbd5e1;
-        flex-shrink: 0;
-        margin-top: 1px;
-    }
-    .highlight-temp { font-weight: 700; color: #1e293b; }
-    .highlight-link {
-        color: #1a2a6c;
-        font-weight: 700;
-        text-decoration: none;
-    }
-    .highlight-link:hover { text-decoration: underline; }
-    .text-muted-sm {
-        font-size: 12.5px;
-        color: #94a3b8;
-        margin-top: 10px;
-        padding-top: 10px;
-        border-top: 1px dashed #e2e8f0;
-    }
+{{-- ===== Header ===== --}}
+<div class="mb-6 flex flex-wrap items-start justify-between gap-4">
+ <div>
+ <h1 class="font-display text-2xl font-extrabold text-slate-800">Dashboard</h1>
+ <p class="mt-1 text-sm text-slate-500">
+ Ringkasan konten portal Bandung Info Center per {{ now()->format('d F Y') }}.
+ </p>
+ </div>
 
-    /* Animations */
-    @keyframes fadeSlideDown {
-        from { opacity: 0; transform: translateY(-14px); }
-        to   { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes fadeSlideUp {
-        from { opacity: 0; transform: translateY(14px); }
-        to   { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Responsive */
-    @media (max-width: 1100px) {
-        .stats-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-    @media (max-width: 700px) {
-        .stats-grid { grid-template-columns: 1fr 1fr; }
-        .info-grid  { grid-template-columns: 1fr; }
-        .dash-header { flex-direction: column; }
-        .weather-temp { font-size: 36px; }
-    }
-</style>
-
-{{-- ======== HEADER ======== --}}
-<div class="dash-header">
-    <div class="dash-welcome">
-        <h1>Selamat Datang, {{ auth()->user()->name ?? 'Admin' }} 👋</h1>
-        <p>Pantau konten portal Bandung Info Center dari satu tempat.</p>
-    </div>
-    <a href="{{ route('admin.kuliner.index') }}" class="btn-manage-kuliner" id="btn-kelola-kuliner">
-        Kelola Kuliner &nbsp;<i class="fas fa-arrow-right"></i>
-    </a>
+ <a href="{{ route('admin.kuliner.index') }}"
+ class="inline-flex items-center gap-2 rounded-[14px] bg-gradient-to-br from-navy-800 to-brand-600 px-6 py-3 font-display text-sm font-semibold text-white shadow-[0_4px_18px_rgba(26,42,108,0.3)] transition hover:shadow-[0_10px_28px_rgba(26,42,108,0.4)]">
+ Kelola Kuliner
+ <i class="fas fa-arrow-right text-xs"></i>
+ </a>
 </div>
 
-{{-- ======== WEATHER CARD ======== --}}
-<div class="weather-card">
-    @php
-        $temp = $weather['temp'] ?? 34;
-        $cond = $weather['condition'] ?? 'Berawan';
-        $time = $weather['time'] ?? now()->format('H:i');
-        $weatherIcon = match(true) {
-            str_contains($cond, 'Cerah Berawan') => '⛅',
-            str_contains($cond, 'Cerah')         => '☀️',
-            str_contains($cond, 'Hujan')          => '🌧️',
-            str_contains($cond, 'Badai')          => '⛈️',
-            str_contains($cond, 'Kabut')          => '🌫️',
-            str_contains($cond, 'Bersalju')       => '❄️',
-            default                               => '☁️',
-        };
-        $tempCategory = $temp >= 27 ? 'Menyegarkan' : 'Menghangatkan';
-    @endphp
+{{-- ===== Kartu cuaca ===== --}}
+<section class="mb-6 overflow-hidden rounded-[20px] bg-gradient-to-br from-navy-800 via-navy-700 to-brand-600 text-white shadow-[0_10px_30px_rgba(26,42,108,0.25)]">
+ <div class="flex flex-wrap items-center justify-between gap-5 p-6">
+ <div class="flex items-center gap-4">
+ <span class="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-white/15 text-2xl text-white backdrop-blur">
+ <i class="fas {{ $weatherIcon }}"></i>
+ </span>
+ <div>
+ <p class="font-display text-4xl font-extrabold leading-none">
+ {{ $temp !== null ? $temp.'°C' : '--°C' }}
+ </p>
+ <p class="mt-1.5 text-sm text-white/80">{{ $condition }} &middot; {{ $region }}</p>
+ </div>
+ </div>
 
-    <div class="weather-top">
-        <div class="weather-main">
-            <div class="weather-icon-wrap">{{ $weatherIcon }}</div>
-            <div>
-                <div class="weather-temp">{{ $temp }}°C</div>
-                <div class="weather-location">{{ $cond }} · Kota Bandung</div>
-            </div>
-        </div>
-        <div class="weather-right">
-            <a href="{{ route('admin.dashboard') }}" class="btn-refresh" id="btn-refresh-weather">
-                <i class="fas fa-snowflake"></i> {{ $tempCategory }}
-            </a>
-            <div class="weather-source">Sumber: Open-Meteo · Pembaruan {{ \Carbon\Carbon::parse($time)->format('H:i') }}</div>
-        </div>
-    </div>
+ <div class="text-right">
+ <span @class([
+ 'inline-flex items-center gap-2 rounded-full border border-white/40 bg-white/15 px-4 py-2 font-display text-sm font-bold backdrop-blur',
+ 'text-sky-100' => $tempCategory === 'Menyegarkan',
+ 'text-orange-100' => $tempCategory === 'Menghangatkan',
+ ])>
+ <i class="fas {{ $tempCategory === 'Menyegarkan' ? 'fa-snowflake' : 'fa-fire' }} text-xs"></i>
+ Rekomendasi: {{ $tempCategory }}
+ </span>
+ <p class="mt-2 text-xs text-white/60">
+ Sumber: Open-Meteo &middot; Pembaruan {{ \Carbon\Carbon::parse($updatedAt)->format('H:i') }}
+ </p>
+ </div>
+ </div>
 
-    <div class="weather-footer">
-        <div class="weather-meta">
-            <div class="weather-meta-item">
-                <i class="fas fa-thermometer-half"></i>
-                <span>Suhu saat ini</span>
-            </div>
-            <div class="weather-meta-item">
-                <i class="fas fa-cloud"></i>
-                <span>{{ $cond }}</span>
-            </div>
-            <div class="weather-meta-item">
-                <i class="fas fa-location-dot"></i>
-                <span>-6,91° LS, 107,61° BT</span>
-            </div>
-        </div>
-    </div>
-</div>
+ <div class="flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-white/15 bg-black/10 px-6 py-3.5 text-xs text-white/70">
+ <span class="inline-flex items-center gap-2">
+ <i class="fas fa-thermometer-half"></i> Suhu saat ini
+ </span>
+ <span class="inline-flex items-center gap-2">
+ <i class="fas fa-cloud"></i> {{ $condition }}
+ </span>
+ @if ($humidity !== null)
+ <span class="inline-flex items-center gap-2">
+ <i class="fas fa-droplet"></i> {{ $humidity }}% kelembapan
+ </span>
+ @endif
+ @if (! empty($weather['windspeed']))
+ <span class="inline-flex items-center gap-2">
+ <i class="fas fa-wind"></i> {{ $weather['windspeed'] }} km/jam
+ </span>
+ @endif
+ <span class="inline-flex items-center gap-2">
+ <i class="fas fa-location-dot"></i> {{ $region }}
+ </span>
+ <a href="{{ route('admin.dashboard') }}" class="ml-auto inline-flex items-center gap-1.5 font-semibold text-white/90 hover:text-white">
+ <i class="fas fa-rotate text-xs"></i> Muat ulang
+ </a>
+ </div>
+</section>
 
-{{-- ======== STATS ROW 1 ======== --}}
-<div class="stats-grid">
-    <div class="stat-card" id="stat-kuliner-total" style="animation-delay:0.16s">
-        <div class="stat-icon-wrap icon-blue">
-            <i class="fas fa-screwdriver-wrench"></i>
-        </div>
-        <div class="stat-value" data-count="{{ $counts['kuliner_total'] }}">{{ $counts['kuliner_total'] }}</div>
-        <div class="stat-label">Total Kuliner</div>
-    </div>
-    <div class="stat-card" id="stat-kuliner-aktif" style="animation-delay:0.21s">
-        <div class="stat-icon-wrap icon-green">
-            <i class="fas fa-star"></i>
-        </div>
-        <div class="stat-value" data-count="{{ $counts['kuliner_aktif'] }}">{{ $counts['kuliner_aktif'] }}</div>
-        <div class="stat-label">Kuliner Aktif</div>
-    </div>
-    <div class="stat-card" id="stat-kuliner-nonaktif" style="animation-delay:0.26s">
-        <div class="stat-icon-wrap icon-orange">
-            <i class="fas fa-ban"></i>
-        </div>
-        <div class="stat-value" data-count="{{ $counts['kuliner_nonaktif'] }}">{{ $counts['kuliner_nonaktif'] }}</div>
-        <div class="stat-label">Kuliner Nonaktif</div>
-    </div>
-    <div class="stat-card" id="stat-wisata" style="animation-delay:0.31s">
-        <div class="stat-icon-wrap icon-purple">
-            <i class="fas fa-building-columns"></i>
-        </div>
-        <div class="stat-value" data-count="{{ $counts['wisata'] }}">{{ $counts['wisata'] }}</div>
-        <div class="stat-label">Destinasi Wisata</div>
-    </div>
-</div>
+{{-- ===== Kartu statistik ===== --}}
+<section class="grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-6">
+ @foreach ($stats as $stat)
+ <a href="{{ $stat['url'] }}"
+ class="group rounded-[14px] border border-slate-200 bg-white p-5 shadow-[0_2px_16px_rgba(26,42,108,0.08)] transition hover:shadow-[0_10px_28px_rgba(26,42,108,0.14)]">
+ <span @class([
+ 'mb-3 grid h-10 w-10 place-items-center rounded-xl text-sm transition group-hover:scale-110',
+ 'bg-brand-50 text-brand-600' => $stat['tone'] === 'blue',
+ 'bg-emerald-50 text-emerald-600' => $stat['tone'] === 'green',
+ 'bg-amber-50 text-amber-600' => $stat['tone'] === 'amber',
+ 'bg-violet-50 text-violet-600' => $stat['tone'] === 'violet',
+ 'bg-sky-50 text-sky-600' => $stat['tone'] === 'sky',
+ 'bg-rose-50 text-rose-600' => $stat['tone'] === 'rose',
+ ])>
+ <i class="fas {{ $stat['icon'] }}"></i>
+ </span>
 
-{{-- ======== STATS ROW 2 ======== --}}
-<div class="stats-grid" style="margin-bottom: 22px;">
-    <div class="stat-card" id="stat-berita" style="animation-delay:0.36s">
-        <div class="stat-icon-wrap icon-teal">
-            <i class="fas fa-newspaper"></i>
-        </div>
-        <div class="stat-value" data-count="{{ $counts['berita'] }}">{{ $counts['berita'] }}</div>
-        <div class="stat-label">Berita</div>
-    </div>
-    <div class="stat-card" id="stat-sejarah" style="animation-delay:0.41s">
-        <div class="stat-icon-wrap icon-orange">
-            <i class="fas fa-book-open"></i>
-        </div>
-        <div class="stat-value" data-count="{{ $counts['sejarah'] }}">{{ $counts['sejarah'] }}</div>
-        <div class="stat-label">Sejarah &amp; Museum</div>
-    </div>
-    <div class="stat-card" id="stat-ulasan" style="animation-delay:0.46s">
-        <div class="stat-icon-wrap icon-pink">
-            <i class="fas fa-book-open-reader"></i>
-        </div>
-        <div class="stat-value" data-count="0">0</div>
-        <div class="stat-label">Ulasan</div>
-    </div>
-    <div class="stat-card" id="stat-pengaduan" style="animation-delay:0.51s">
-        <div class="stat-icon-wrap icon-gray">
-            <i class="fas fa-envelope"></i>
-        </div>
-        <div class="stat-value" data-count="0">0</div>
-        <div class="stat-label">Pengaduan Baru</div>
-    </div>
-</div>
+ <p class="font-display text-3xl font-extrabold text-slate-800">
+ {{ number_format($stat['value'], 0, ',', '.') }}
+ </p>
+ <p class="mt-0.5 text-xs font-medium text-slate-500">{{ $stat['label'] }}</p>
+ </a>
+ @endforeach
+</section>
 
-{{-- ======== INFO CARDS ======== --}}
-<div class="info-grid">
-    <div class="info-card" id="card-cuaca-kategori">
-        <h3><span style="font-size:19px;">🔥</span> Kategori Cuaca Hari Ini</h3>
-        <p>
-            Suhu <span class="highlight-temp">{{ $temp }}°C ({{ $cond }})</span> — sistem menampilkan rekomendasi kategori
-            <a href="{{ route('admin.kuliner.index') }}" class="highlight-link">{{ $tempCategory }}</a> pada halaman publik.
-        </p>
-        <p class="text-muted-sm">Ambang batas: di bawah 27°C → Menghangatkan &nbsp;·&nbsp; 27°C ke atas → Menyegarkan.</p>
-    </div>
+{{-- ===== Pintasan ===== --}}
+<section class="mt-6 grid gap-4 md:grid-cols-2">
+ @foreach (config('nav.admin') as $item)
+ @continue($item['route'] === 'admin.dashboard')
 
-    <div class="info-card" id="card-aturan-bisnis">
-        <h3><span style="font-size:19px;">❄️</span> Aturan Bisnis Aktif</h3>
-        <ul>
-            <li>Kuliner <strong>Nonaktif</strong> otomatis disembunyikan dari halaman publik.</li>
-            <li>Rekomendasi beranda mengikuti kategori cuaca terkini.</li>
-            <li>Semua perubahan langsung tersimpan di database SQLite.</li>
-        </ul>
-    </div>
-</div>
+ <a href="{{ route($item['route']) }}"
+ class="flex items-center gap-4 rounded-[14px] border border-slate-200 bg-white p-5 shadow-[0_2px_16px_rgba(26,42,108,0.08)] transition hover:border-brand-500">
+ <span class="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-navy-800 text-white">
+ <i class="fas {{ $item['icon'] }}"></i>
+ </span>
+ <span class="min-w-0 flex-1">
+ <span class="block font-display text-sm font-bold text-slate-800">{{ $item['label'] }}</span>
+ <span class="block truncate text-xs text-slate-500">Kelola data {{ strtolower($item['label']) }}</span>
+ </span>
+ <i class="fas fa-chevron-right text-xs text-slate-300 transition group-hover:text-brand-600"></i>
+ </a>
+ @endforeach
+</section>
 
-<script>
-    // Counter animation for stat values
-    document.addEventListener('DOMContentLoaded', function () {
-        const counters = document.querySelectorAll('.stat-value[data-count]');
-        counters.forEach(el => {
-            const target = parseInt(el.getAttribute('data-count'), 10);
-            if (isNaN(target) || target === 0) return;
-            let start = 0;
-            const duration = 900;
-            const step = Math.ceil(target / (duration / 16));
-            const timer = setInterval(() => {
-                start += step;
-                if (start >= target) {
-                    el.textContent = target;
-                    clearInterval(timer);
-                } else {
-                    el.textContent = start;
-                }
-            }, 16);
-        });
-    });
-</script>
-
+{{-- ===== Catatan ===== --}}
+<section class="mt-6 rounded-[14px] border border-slate-200 bg-white p-6 shadow-[0_2px_16px_rgba(26,42,108,0.08)]">
+ <h2 class="font-display text-sm font-bold text-slate-800">Catatan Teknis</h2>
+ <ul class="mt-3 space-y-1.5 text-sm text-slate-600">
+ <li class="flex gap-2">
+ <i class="fas fa-circle-check mt-1 text-[10px] text-emerald-500"></i>
+ Semua perubahan langsung tersimpan di database MySQL.
+ </li>
+ <li class="flex gap-2">
+ <i class="fas fa-circle-check mt-1 text-[10px] text-emerald-500"></i>
+ Slug dibuat otomatis dan dijamin unik saat menyimpan data.
+ </li>
+ <li class="flex gap-2">
+ <i class="fas fa-circle-check mt-1 text-[10px] text-emerald-500"></i>
+ Kolom <code class="rounded bg-slate-100 px-1.5 py-0.5 text-xs">id_user</code> mencatat admin pembuat konten.
+ </li>
+ </ul>
+</section>
 @endsection

@@ -3,43 +3,44 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Contact;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
 
+/**
+ * Profil kontak memakai satu baris singleton, jadi modul resource ini
+ * hanya menyediakan form edit.
+ */
 class ContactController extends Controller
 {
-    public function index()
+    public function index(): View
     {
-        $contact = Contact::first();
-        if (!$contact) {
-            $contact = Contact::create(['address' => 'Balai Kota Bandung']);
-        }
+        $contact = Contact::instance();
+
         return view('admin.contact.form', compact('contact'));
     }
 
-    public function create() { }
-    
-    public function store(Request $request) { }
-    
-    public function show(string $id) { }
-    
-    public function edit(string $id) { }
-
-    public function update(Request $request, string $id)
+    public function edit(Contact $contact): View
     {
-        $validated = $request->validate([
-            'address' => 'nullable|string',
-            'email' => 'nullable|email',
-            'phone' => 'nullable|string',
-            'map_embed' => 'nullable|string',
-            'facebook' => 'nullable|string',
-            'instagram' => 'nullable|string',
-        ]);
-
-        $contact = Contact::findOrFail($id);
-        $contact->update($validated);
-        return redirect()->route('admin.contact.index')->with('success', 'Contact updated successfully.');
+        return view('admin.contact.form', compact('contact'));
     }
 
-    public function destroy(string $id) { }
+    public function update(Request $request, Contact $contact): RedirectResponse
+    {
+        $validated = $request->validate([
+            'address' => ['nullable', 'string'],
+            'email' => ['nullable', 'email', 'max:255'],
+            'phone' => ['nullable', 'string', 'max:100'],
+            'map_embed' => ['nullable', 'string'],
+            'facebook' => ['nullable', 'string', 'max:255'],
+            'instagram' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $contact->update($validated);
+
+        return redirect()
+            ->route('admin.contact.index')
+            ->with('success', 'Data kontak berhasil diperbarui.');
+    }
 }

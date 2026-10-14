@@ -58,7 +58,9 @@ return [
             'strict' => true,
             'engine' => null,
             'options' => extension_loaded('pdo_mysql') ? array_filter([
-                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+                // Key berupa string karena konstanta PDO::MYSQL_ATTR_SSL_CA
+                // sudah deprecated pada PHP 8.4.
+                'mysql_ssl_ca' => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
         ],
 
@@ -78,7 +80,9 @@ return [
             'strict' => true,
             'engine' => null,
             'options' => extension_loaded('pdo_mysql') ? array_filter([
-                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+                // Key berupa string karena konstanta PDO::MYSQL_ATTR_SSL_CA
+                // sudah deprecated pada PHP 8.4.
+                'mysql_ssl_ca' => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
         ],
 

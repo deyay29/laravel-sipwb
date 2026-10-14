@@ -14,6 +14,31 @@ return [
     |
     */
 
+    /*
+    |--------------------------------------------------------------------------
+    | Open-Meteo (cuaca)
+    |--------------------------------------------------------------------------
+    |
+    | Wilayah yang ditampilkan. Nama wilayah ("Bandung") diterjemahkan menjadi
+    | koordinat lewat Geocoding API Open-Meteo, lalu disimpan di cache.
+    | Koordinat di bawah hanya dipakai sebagai cadangan bila API gagal.
+    |
+    */
+
+    'open_meteo' => [
+        'region' => env('WEATHER_REGION', 'Bandung'),
+
+        'latitude' => env('WEATHER_LATITUDE', -6.92222),
+        'longitude' => env('WEATHER_LONGITUDE', 107.60694),
+        'timezone' => env('WEATHER_TIMEZONE', 'Asia/Jakarta'),
+
+        // Berapa lama hasil geocoding disimpan (menit).
+        'geocode_cache_minutes' => 60 * 24,
+
+        'forecast_url' => 'https://api.open-meteo.com/v1/forecast',
+        'geocoding_url' => 'https://geocoding-api.open-meteo.com/v1/search',
+    ],
+
     'postmark' => [
         'token' => env('POSTMARK_TOKEN'),
     ],

@@ -8,6 +8,8 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
+     *
+     * Halaman profil publik memakai satu baris singleton.
      */
     public function up(): void
     {
