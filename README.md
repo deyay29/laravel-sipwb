@@ -23,7 +23,7 @@ Laravel 12 · Tailwind CSS 4 · MySQL · PHP 8.2+
 9. [Cara Kerja Git](#9-cara-kerja-git)
 10. [Perintah yang Sering Digunakan](#10-perintah-yang-sering-digunakan)
 11. [Troubleshooting](#11-troubleshooting)
-12. [Deployment](#12-deployment)
+12. [Deployment dan CI/CD](#12-deployment-dan-cicd)
 
 ---
 
@@ -923,35 +923,133 @@ git diff
 
 ---
 
-## 12. Deployment
+## 12. Deployment dan CI/CD
 
-> Ringkasan saja. Untuk deploy ke server sungguhan, disarankan mengikuti
+Situs produksi: **https://laravel-sipwb.ryaze.my.id**
+
+> Untuk panduan Laravel umum, lihat juga
 > [Panduan Deployment Laravel](https://laravel.com/docs/12.x/deployment).
 
-### Daftar Periksa Sebelum Upload
+### Cara Kerjanya secara otomatis
 
-```bash
-# Pastikan tidak ada file sensitif yang ikut ter-commit
-git status
+Tiap kali ada `git push` ke branch `master`, GitHub Actions otomatis:
 
-# Pastikan test lulus
-php artisan test
-
-# Pastikan tidak ada error di kode
-./vendor/bin/pint --test
+```
+push ke master
+      ↓
+┌─────────────────────────────┐
+│ 1. CEK KODE                 │  Pint + views:lint + build + 22 pengujian
+│    (job: "cek")             │  gagal → deploy DIBATALKAN
+└──────────────┬──────────────┘
+               ↓ semua lulus
+┌─────────────────────────────┐
+│ 2. DEPLOY                   │  SSH ke server, lalu:
+│    (job: "deploy")          │  · mode maintenance
+└──────────────┬──────────────┘  · git pull
+               ↓                 · composer install --no-dev
+┌─────────────────────────────┐  · npm ci + npm run build
+│ 3. CEK KESEHATAN            │  · php artisan migrate --force
+│                             │  · optimize:clear
+│  gagal → ROLLBACK otomatis  │  · cek halaman /up
+└─────────────────────────────┘
 ```
 
-### Checklist Deployment
+Kode yang menggagalkan pengujian **tidak pernah** sampai ke server.
+
+### Menjalankan Manual
+
+Deploy juga bisa dijalankan tanpa GitHub Actions:
+
+```bash
+/mnt/sipwb-deploy/sipwb-deploy.sh
+```
+
+Perintah lain yang tersedia lewat SSH deploy:
+
+```bash
+ssh -i /mnt/sipwb-deploy/keys/github_actions_deploy bima@103.148.131.180 'health'   # cek kesehatan
+ssh -i /mnt/sipwb-deploy/keys/github_actions_deploy bima@103.148.131.180 'status'   # commit aktif
+ssh -i /mnt/sipwb-deploy/keys/github_actions_deploy bima@103.148.131.180 'ping'     # cek koneksi
+```
+
+### GitHub Secrets yang Dibutuhkan
+
+Buka **Settings → Secrets and variables → Actions → New repository secret**:
+
+| Nama | Isi |
+|---|---|
+| `DEPLOY_SSH_KEY` | Isi penuh file `github_actions_deploy` (termasuk baris `BEGIN` dan `END`) |
+| `DEPLOY_HOST` | `103.148.131.180` |
+| `DEPLOY_USER` | `bima` |
+| `TEST_DB_PASSWORD` | Password MySQL bawaan GitHub Actions (`root`) |
+
+### Pengamanan
+
+Kunci SSH untuk deploy dipasang dengan pembatasan ketat di `~/.ssh/authorized_keys`:
+
+```
+restrict,command="/mnt/sipwb-deploy/forced-command.sh" ssh-ed25519 AAAA... deploy
+```
+
+Artinya kalau private key sampai bocor, orang yang memegangnya **tidak bisa**
+membuka shell, membaca file, atau menjalankan perintah lain di server.
+Satu-satunya yang bisa: memicu deploy, cek kesehatan, atau lihat status.
+
+### DNS
+
+Domain produksi memakai Cloudflare. Supaya situsnya bisa diakses, tambahkan:
+
+| Tipe | Nama | Isi |
+|---|---|---|
+| `A` | `laravel-sipwb.ryaze.my.id` | `103.148.131.180` |
+
+Sertifikat HTTPS sudah otomatis karena memakai sertifikat wildcard
+(`CN=ryaze.my.id`) dari Let's Encrypt.
+
+### Server Produksi
+
+| Bagian | Nilai |
+|---|---|
+| Folder aplikasi | `/opt/1panel/apps/openresty/openresty/www/sites/hosting_clients/laravel-sipwb` |
+| Skrip deploy | `/mnt/sipwb-deploy/sipwb-deploy.sh` |
+| Pengatur perintah | `/mnt/sipwb-deploy/forced-command.sh` |
+| Kunci deploy | `/mnt/sipwb-deploy/keys/` |
+| Database | `SIPWB_web` (terpisah dari `SIPWB` milik pengembangan) |
+| User database | `sipwb_web` (hanya punya akses ke `SIPWB_web`) |
+| PHP-FPM | Container Docker `1Panel-php8-aJQI` |
+| Database | Container Docker `1Panel-mysql-KZAi` |
+
+> **Penting:** `DB_HOST` produksi adalah `1Panel-mysql-KZAi`, bukan
+> `127.0.0.1`. PHP-FPM berjalan di dalam container Docker, dan nama container
+> MySQL hanya bisa diresolve dari dalam jaringan Docker.
+> Karena itu skrip deploy menjalankan `php artisan` lewat `docker exec`.
+
+### Kalau Deploy Gagal
+
+Rollback berjalan otomatis. Untuk memeriksa penyebabnya:
+
+```bash
+tail -50 /opt/1panel/.../laravel-sipwb/storage/logs/laravel-$(date +%F).log
+```
+
+Deploy sengaja berhenti kalau sisa disk di bawah 1 GB, supaya server tidak
+makin penuh. Depois berhasil deploy, cek lagi:
+
+```bash
+df -h /
+```
+
+### Checklist Manual (tanpa GitHub Actions)
 
 - [ ] `APP_ENV=production`
 - [ ] `APP_DEBUG=false`
+- [ ] `ASSET_URL` diisi `https://` (kalau lupa, aset akan diblokir browser)
 - [ ] `APP_KEY` sudah di-*generate* di server
-- [ ] Password database di `.env` server sudah diganti
+- [ ] Password database produksi sudah diganti
 - [ ] Akun admin default **sudah ganti password**
+- [ ] `storage/` dan `bootstrap/cache/` writable oleh user web server
 - [ ] `php artisan migrate --force` sudah dijalankan
 - [ ] `npm run build` sudah dijalankan
-- [ ] `php artisan config:cache && php artisan route:cache && php artisan view:cache`
-- [ ] `storage/` dan `bootstrap/cache/` writable oleh web server
 
 ---
 
