@@ -18,10 +18,24 @@ use Illuminate\Support\Facades\Http;
  *
  * Semua kegagalan jaringan ditangani dengan rapi: method mengembalikan null dan
  * pemanggil wajib menyiapkan tampilan cadangan.
+ *
+ * ============ PERFORAANS ============
+ * Halaman publik hanya butuh satu Angka suhu, dan data cuaca tidak berubah
+ * tiap detik. Karena itu hasil API tidak pernah diambil ulang pada setiap
+ * request, melainkan:
+ *
+ * 1. "fresh"  -> dipakai langsung selama masih dalam masa berlaku (default 15 menit).
+ * 2. "stale"  -> cadangan 6 jam, dipakai hanya ketika API sedang gagal/down.
+ *
+ * Dengan begitu halaman publik tidak pernah menunggu jaringan, dan kalau API
+ * sedang tidak bisa dihubungi halaman tetap menampilkan cuaca terakhir yang
+ * diketahui, bukan kosong.
  */
 class WeatherService
 {
     /**
+     * Data cuaca saat ini.
+     *
      * @return array{
      *     temp: int, windspeed: float, humidity: ?int, time: ?string,
      *     condition: string, is_rain: bool, region: string
@@ -29,10 +43,42 @@ class WeatherService
      */
     public function current(): ?array
     {
+        // 1. Cache masih segar -> langsung pakai, tanpa menyentuh jaringan.
+        $fresh = Cache::get($this->freshKey());
+        if (is_array($fresh)) {
+            return $fresh;
+        }
+
+        // 2. Cache kosong -> panggil API (dengan batas waktu pendek).
+        $data = $this->fetch();
+
+        if ($data !== null) {
+            Cache::put($this->freshKey(), $data, now()->addMinutes($this->freshMinutes()));
+            Cache::put($this->staleKey(), $data, now()->addHours($this->staleHours()));
+
+            return $data;
+        }
+
+        // 3. API gagal -> pakai hasil terakhir yang masih tersimpan, supaya
+        //    halaman tidak kosong hanya karena jaringan sedang bermasalah.
+        $stale = Cache::get($this->staleKey());
+
+        return is_array($stale) ? $stale : null;
+    }
+
+    /**
+     * Ambil data mentah dari Open-Meteo.
+     *
+     * Dipisah dari current() supaya current() bisa memakai cache dulu, dan
+     * supaya kegagalan jaringan langsung mengembalikan null tanpa retry.
+     */
+    private function fetch(): ?array
+    {
         $location = $this->location();
 
         try {
-            $response = Http::timeout(5)
+            $response = Http::timeout(3)
+                ->connectTimeout(2)
                 ->get($location['forecast_url'], [
                     'latitude' => $location['latitude'],
                     'longitude' => $location['longitude'],
@@ -68,8 +114,36 @@ class WeatherService
         ];
     }
 
+    /** Kunci cache data yang masih segar. */
+    private function freshKey(): string
+    {
+        return 'weather.current.'.md5((string) config('services.open_meteo.region'));
+    }
+
+    /** Kunci cache cadangan saat API sedang gagal. */
+    private function staleKey(): string
+    {
+        return 'weather.stale.'.md5((string) config('services.open_meteo.region'));
+    }
+
+    /** Masa berlaku data cuaca (menit). */
+    private function freshMinutes(): int
+    {
+        return (int) config('services.open_meteo.forecast_cache_minutes', 15);
+    }
+
+    /** Masa berlaku cadangan (jam). */
+    private function staleHours(): int
+    {
+        return (int) config('services.open_meteo.stale_cache_hours', 6);
+    }
+
     /**
      * Wilayah + koordinat yang dipakai.
+     *
+     * Geocoding cukup dipanggil SEKALI lalu hasilnya dipakai untuk label,
+     * latitude, dan longitude. Sebelumnya method ini memanggil geocode()
+     * tiga kali sehingga satu request bisa menembak API geocoding tiga kali.
      *
      * @return array{region: string, label: string, latitude: float, longitude: float, timezone: string, forecast_url: string}
      */
@@ -77,11 +151,14 @@ class WeatherService
     {
         $config = config('services.open_meteo');
 
+        // geocode() selalu mengembalikan array (ada fallback bila API gagal).
+        $geo = $this->geocode($config);
+
         return [
             'region' => $config['region'],
-            'label' => $this->geocode($config)['label'] ?? $config['region'],
-            'latitude' => $this->geocode($config)['latitude'] ?? $config['latitude'],
-            'longitude' => $this->geocode($config)['longitude'] ?? $config['longitude'],
+            'label' => $geo['label'],
+            'latitude' => $geo['latitude'],
+            'longitude' => $geo['longitude'],
             'timezone' => $config['timezone'],
             'forecast_url' => $config['forecast_url'],
         ];

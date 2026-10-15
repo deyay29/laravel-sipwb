@@ -31,9 +31,14 @@ class PublicController extends Controller
         return view('public.home', [
             // Jumlah item dan kolom grid sengaja dibuat sama (4) untuk semua
             // section, agar ukuran setiap card di beranda identik.
+            //
+            // with()/withCount() dipakai agar relasi diambil sekaligus dalam
+            // satu query. Tanpa itu, tiap baris di dalam loop view akan
+            // memicu query tersendiri (N+1) dan halaman makin lama saat data
+            // bertambah banyak.
             'wisatas' => Wisata::latest()->take(4)->get(),
-            'beritas' => Berita::latest('tanggal')->take(4)->get(),
-            'sejarahs' => Sejarah::latest()->take(4)->get(),
+            'beritas' => Berita::with('reaksi')->latest('tanggal')->take(4)->get(),
+            'sejarahs' => Sejarah::withCount('babs')->latest()->take(4)->get(),
             'kuliners' => $this->rekomendasiKuliner($suhuKategori),
 
             'weather' => $weather,
@@ -145,17 +150,28 @@ class PublicController extends Controller
 
     public function berita(): View
     {
-        $beritas = Berita::latest('tanggal')->paginate(10);
+        // with('reaksi') mencegah N+1: jumlah reaksi untuk seluruh halaman
+        // diambil dalam satu query, bukan satu query per berita.
+        $beritas = Berita::with('reaksi')->latest('tanggal')->paginate(10);
 
         return view('public.berita.index', compact('beritas'));
     }
 
     public function beritaShow(Berita $berita): View
     {
+        // Ditambah secara langsung: satu query UPDATE sederhana (kurang dari 1 ms)
+        // dan perilakunya mudah ditebak serta bisa diuji.
         $berita->increment('visitor_count');
 
         // Satu berita hanya boleh punya satu baris reaksi.
-        $reaksi = ReaksiBerita::firstOrCreate(['id_berita' => $berita->id_berita]);
+        // firstOrNew() tidak menulis apa pun sendiri, dan save() hanya dipanggil
+        // bila barisnya memang belum pernah ada. Kalau tidak, setiap opening
+        // halaman akan sia-sia melakukan UPDATE ke tabel yang tidak berubah.
+        $reaksi = ReaksiBerita::firstOrNew(['id_berita' => $berita->id_berita]);
+
+        if (! $reaksi->exists) {
+            $reaksi->save();
+        }
 
         return view('public.berita.show', compact('berita', 'reaksi'));
     }
@@ -208,7 +224,9 @@ class PublicController extends Controller
 
     public function sejarah(): View
     {
-        $sejarahs = Sejarah::latest()->paginate(10);
+        // withCount('babs') mengisi $topik->babs_count yang dipakai badge
+        // "3 bab" di view, tanpa query tambahan per topik.
+        $sejarahs = Sejarah::withCount('babs')->latest()->paginate(10);
 
         return view('public.sejarah.index', compact('sejarahs'));
     }

@@ -35,6 +35,15 @@ return [
         // Berapa lama hasil geocoding disimpan (menit).
         'geocode_cache_minutes' => 60 * 24,
 
+        // Berapa lama data cuaca dianggap masih segar (menit).
+        // Semakin kecil, semakin sering API dipanggil, tapi tetap jauh lebih
+        // jarang daripada satu panggilan API per permintaan halaman.
+        'forecast_cache_minutes' => (int) env('WEATHER_CACHE_MINUTES', 15),
+
+        // Berapa lama cuaca terakhir disimpan sebagai cadangan (jam).
+        // Dipakai hanya ketika API sedang tidak bisa dihubungi.
+        'stale_cache_hours' => (int) env('WEATHER_STALE_HOURS', 6),
+
         'forecast_url' => 'https://api.open-meteo.com/v1/forecast',
         'geocoding_url' => 'https://geocoding-api.open-meteo.com/v1/search',
     ],
