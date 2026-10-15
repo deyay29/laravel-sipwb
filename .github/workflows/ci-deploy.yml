@@ -1,0 +1,130 @@
+name: CI & Deploy
+
+# Setiap push dan pull request akan diperiksa.
+# Hanya push ke branch master yang dideploy ke produksi.
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+# Jangan jalankan dua workflow beruntun untuk commit yang sama.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  # ================================================================
+  # 1. CEK — jalan sebelum deploy. Kalau gagal, deploy dibatalkan
+  #    supaya kode rusak tidak pernah sampai ke server.
+  # ================================================================
+  cek:
+    name: Cek Kode
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Ambil kode
+        uses: actions/checkout@v4
+
+      - name: Pasang PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, pdo_mysql, xml, curl, zip
+          coverage: none
+
+      - name: Pasang dependency PHP
+        uses: ramsey/composer-install@v3
+        with:
+          composer-options: --prefer-dist --no-progress
+
+      - name: Cache dependency
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json') }}
+          restore-keys: ${{ runner.os }}-npm-
+
+      - name: Pasang dependency JavaScript
+        run: npm ci --no-audit --no-fund
+
+      - name: Bikin APP_KEY sementara (dipakai pengujian)
+        run: cp .env.example .env && php artisan key:generate
+
+      - name: Pastikan database pengujian ada
+        env:
+          MYSQL_PWD: ${{ secrets.TEST_DB_PASSWORD }}
+        run: |
+          # GitHub Actions menyediakan MySQL di localhost:3306, jadi cukup
+          # membuat database pengujian. Ini TIDAK menyentuh database produksi.
+          mysql -h 127.0.0.1 -P 3306 -u root -e \
+            "CREATE DATABASE IF NOT EXISTS SIPWB_testing CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+          echo "Database pengujian siap."
+
+      - name: Cek format kode (Pint)
+        run: ./vendor/bin/pint --test
+
+      - name: Cek semua file blade
+        run: php artisan views:lint
+
+      - name: Bangun aset frontend
+        run: npm run build
+
+      - name: Jalankan pengujian otomatis
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: '3306'
+          DB_DATABASE: SIPWB_testing
+          DB_USERNAME: root
+          DB_PASSWORD: ${{ secrets.TEST_DB_PASSWORD }}
+        run: php artisan test
+
+  # ================================================================
+  # 2. DEPLOY — hanya jalan setelah "Cek Kode" lulus.
+  # ================================================================
+  deploy:
+    name: Deploy ke Produksi
+    # Pengaman ganda: selain `needs`, job ini juga tidak jalan untuk PR.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    needs: cek
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    environment:
+      name: production
+      url: https://laravel-sipwb.ryaze.my.id
+
+    steps:
+      - name: Beri tahu sedang mulai
+        run: echo "Deploy ${{ github.sha }} ke produksi..."
+
+      - name: Siapkan SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
+
+      # Host check prevents accepting an unknown server fingerprint. Don't use
+      # StrictHostKeyChecking=no in production, or a man-in-the-middle attack
+      # becomes possible.
+      - name: Cek koneksi ke server
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
+          ssh -o BatchMode=yes ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} 'ping'
+
+      - name: Pastikan situs sehat sebelum deploy
+        run: ssh -o BatchMode=yes ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} 'health'
+
+      - name: Jalankan deploy
+        run: ssh -o BatchMode=yes ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} 'deploy'
+
+      - name: Pastikan situs sehat sesudah deploy
+        run: ssh -o BatchMode=yes ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} 'health'
+
+      - name: Lihat commit yang ter-deploy
+        run: ssh -o BatchMode=yes ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} 'status'
