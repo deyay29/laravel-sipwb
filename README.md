@@ -225,8 +225,8 @@ DB_PASSWORD=
 | Pengaturan | Artinya |
 |---|---|
 | `DB_HOST` | Alamat server MySQL. `127.0.0.1` = komputer sendiri (paling umum) |
-| `DB_PORT` | Porta MySQL, biasanya `3306` |
-| `DB_DATABASE` | Nama database,harus `SIPWB` (huruf besar) |
+| `DB_PORT` | Port MySQL, biasanya `3306` |
+| `DB_DATABASE` | Nama database, harus `SIPWB` (huruf besar) |
 | `DB_USERNAME` | User MySQL, biasanya `root` |
 | `DB_PASSWORD` | Password MySQL. Kosongkan kalau XAMPP |
 
@@ -436,8 +436,14 @@ laravel-sipwb/
 │       ├── layouts/              # "Kerangka" halaman
 │       │   └── partials/         # Potongan: navbar, footer, sidebar
 │       ├── admin/                # View panel admin (per fitur)
-│       ├── auth/                 # (loginGI gabung ke public/auth)
 │       └── public/               # View halaman publik (per fitur)
+│           ├── auth/             # Halaman login admin
+│           ├── berita/           # index.blade.php + show.blade.php
+│           ├── wisata/           # index.blade.php + show.blade.php
+│           ├── kuliner/           # index.blade.php + show.blade.php
+│           ├── sejarah/           # index / show / chapter
+│           ├── galeri/           # index.blade.php
+│           └── smart-budget/     # index.blade.php
 │
 ├── routes/web.php                # Daftar URL aplikasi
 ├── storage/                      # Log, cache, file upload (jangan diedit)
@@ -639,7 +645,7 @@ git status
 git add .              # semua file yang berubah
 git add app/Models/    # hanya folder tertentu
 git add README.md      # hanya satu file
-git add -p             # pilih baris per baris (untuk awhile)
+git add -p             # pilih baris per baris (untuk yang sudah biasa)
 ```
 
 ---
@@ -672,7 +678,7 @@ bentar
 
 ### `git push` — Mengirim ke GitHub
 
-# Kalau sudah pernah-determined setup branch utama:
+```bash
 # Kalau branch utama sudah pernah di-*push* sebelumnya:
 git push
 
@@ -703,12 +709,12 @@ git pull
 **Kapan wajib dilakukan:**
 
 - Setiap kali mulai mengerjakan
-- Setelah ada/pull request dari rekan tim
+- Setelah ada pull request dari rekan tim
 - Setelah teamed-up apa pun
 
 ---
 
-### Menjalankan Pekerjaan di Branch Terpisah (Penting!)
+### Menjalankan Pekerjaan di Branch Terpisah (Penting)
 
 Branch dipakai agar perubahan kita tidak langsung mencampur dengan kode utama.
 
@@ -756,7 +762,7 @@ git push
 
 ### Prinsip Penting Git
 
-1. **Jangan pernah** melakukan `git add .` tanpa*Rela melihat `git status` dulu.
+1. **Jangan pernah** menjalankan `git add .` tanpa melihat `git status` lebih dulu.
 2. **Selalu** `git pull` sebelum mulai kerja.
 3. **Selalu** `git status` sebelum `git commit`.
 4. **Jangan pernah** commit file `.env` (berisi password database).
@@ -777,7 +783,7 @@ Sudah otomatis diatur di `.gitignore`:
 /storage/     # log & file upload
 ```
 
-> Kalau terlanjur terlanjur commit `.env`,Segera hapus dari riwayat GitHub dan
+> Kalau terlanjur commit `.env`, segera hapus dari riwayat GitHub dan
 > **ganti password database**.
 
 ---
@@ -905,8 +911,8 @@ php artisan optimize:clear
 
 ```bash
 php artisan serve --port=8080
+
 ```
-### Lupa-change-nya dari Mana
 ### Lupa Perubahan-nya dari Mana
 
 ```bash
