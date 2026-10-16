@@ -208,7 +208,11 @@ class PublicController extends Controller
 
     public function wisataShow(Wisata $wisata): View
     {
-        return view('public.wisata.show', compact('wisata'));
+        // Paket anggaran ikut dikirim supaya section Smart Budget bisa
+        // ditampilkan di dalam halaman detail (anchor #smart-budget).
+        $pakets = SmartBudgetPaket::orderBy('total_estimasi')->get();
+
+        return view('public.wisata.show', compact('wisata', 'pakets'));
     }
 
     public function smartBudgetIndex(): View

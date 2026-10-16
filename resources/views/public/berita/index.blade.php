@@ -10,7 +10,7 @@
  :breadcrumb="['Beranda' => route('home'), 'Berita' => null]"
 />
 
-<section class="mx-auto max-w-7xl px-4 py-14 sm:px-6">
+<section class="mx-auto max-w-[1400px] px-4 py-14 sm:px-6">
  <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
  @forelse ($beritas as $berita)
  <article class="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_2px_16px_rgba(15,23,42,0.06)] transition hover:shadow-[0_12px_32px_rgba(15,23,42,0.10)]">

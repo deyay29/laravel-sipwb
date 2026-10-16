@@ -7,7 +7,6 @@
 {{-- Hero --}}
 <x-public.page-hero
  :title="$berita->judul"
- :image="$berita->gambar"
  :breadcrumb="[
  'Beranda' => route('home'),
  'Berita' => route('public.berita'),
@@ -15,7 +14,7 @@
  ]"
 />
 
-<section class="mx-auto max-w-4xl px-4 py-12 sm:px-6">
+<section class="mx-auto max-w-[1400px] px-4 py-12 sm:px-6">
 <a href="{{ route('public.berita') }}"
    class="mb-8 inline-flex items-center gap-2 font-display text-sm font-semibold text-brand-700 transition hover:text-brand-800">
     <i class="fas fa-arrow-left text-xs"></i>

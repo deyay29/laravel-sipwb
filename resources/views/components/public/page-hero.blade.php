@@ -41,9 +41,11 @@
         ratio="absolute inset-0 -z-20 h-full w-full"
     />
 
-    {{-- Lapisan gelap agar navbar & teks tetap terbaca --}}
-    <div class="absolute inset-0 -z-10 bg-gradient-to-r from-navy-900/95 via-navy-800/85 to-navy-900/70"></div>
-    <div class="absolute inset-0 -z-10 bg-gradient-to-t from-navy-900/70 via-transparent to-navy-900/60"></div>
+    {{-- Lapisan gelap agar navbar & teks tetap terbaca.
+         Opacity diturunkan supaya foto kota lebih terlihat; tetap cukup
+         gelap untuk teks putih di atasnya. --}}
+    <div class="absolute inset-0 -z-10 bg-gradient-to-r from-navy-900/75 via-navy-800/55 to-navy-900/40"></div>
+    <div class="absolute inset-0 -z-10 bg-gradient-to-t from-navy-900/45 via-transparent to-navy-900/30"></div>
 
     <div @class([
         'mx-auto max-w-[1400px] px-5 pb-16 pt-32 sm:px-6 lg:px-8 lg:pb-20 lg:pt-40',

@@ -34,7 +34,7 @@
     </x-slot:aside>
 </x-public.page-hero>
 
-<section class="mx-auto max-w-7xl px-4 py-14 sm:px-6">
+<section class="mx-auto max-w-[1400px] px-4 py-14 sm:px-6">
     {{-- ===== Filter kategori suhu ===== --}}
     <div class="mb-10 flex flex-wrap items-center gap-3">
         <span class="font-display text-sm font-semibold text-slate-600">Saring menurut suhu:</span>
@@ -52,7 +52,7 @@
             <a href="{{ $value ? route('public.kuliner', ['suhu' => $value]) : route('public.kuliner') }}"
                @class([
                    'inline-flex items-center gap-2 rounded-full px-5 py-2.5 font-display text-sm font-semibold transition',
-                   'bg-brand-600 text-white shadow-[0_4px_14px_rgba(37,99,235,0.3)]' => $isActive,
+                   'bg-brand-600 text-white shadow-[0_4px_14px_rgba(37,65,160,0.3)]' => $isActive,
                    'border border-slate-200 bg-white text-slate-600 hover:border-brand-500 hover:text-brand-700' => ! $isActive,
                ])>
                 @if ($filter['icon'])

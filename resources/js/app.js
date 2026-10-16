@@ -52,6 +52,104 @@ function initStickyNavbar() {
 }
 
 /*
+ * Pencarian Mobile (Dropdown di bawah topbar).
+ */
+function initMobileSearch() {
+    const toggle = document.querySelector('[data-mobile-search-toggle]');
+    const panel = document.querySelector('[data-mobile-search-bar]');
+    const closeBtn = document.querySelector('[data-mobile-search-close]');
+    const input = panel ? panel.querySelector('input[type="search"]') : null;
+
+    if (!toggle || !panel) return;
+
+    const setOpen = (open) => {
+        panel.toggleAttribute('hidden', !open);
+        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        if (open && input) {
+            setTimeout(() => input.focus(), 80);
+        }
+    };
+
+    toggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        setOpen(panel.hasAttribute('hidden'));
+    });
+
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => setOpen(false));
+    }
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && !panel.hasAttribute('hidden')) {
+            setOpen(false);
+            toggle.focus();
+        }
+    });
+
+    document.addEventListener('click', (event) => {
+        if (panel.hasAttribute('hidden')) return;
+        if (panel.contains(event.target) || toggle.contains(event.target)) return;
+        setOpen(false);
+    });
+
+    window.matchMedia('(min-width: 1024px)').addEventListener('change', (event) => {
+        if (event.matches) setOpen(false);
+    });
+}
+
+/*
+ * Bottom Sheet Drawer Mobile (Menu & Layanan Lainnya).
+ */
+function initMobileBottomSheet() {
+    const toggle = document.querySelector('[data-bottom-sheet-toggle]');
+    const sheet = document.querySelector('[data-bottom-sheet]');
+    const backdrop = document.querySelector('[data-bottom-sheet-backdrop]');
+    const closeBtn = document.querySelector('[data-bottom-sheet-close]');
+
+    if (!toggle || !sheet) return;
+
+    const setOpen = (open) => {
+        sheet.toggleAttribute('hidden', !open);
+        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        if (open) {
+            document.body.classList.add('overflow-hidden');
+        } else {
+            document.body.classList.remove('overflow-hidden');
+        }
+    };
+
+    toggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        setOpen(sheet.hasAttribute('hidden'));
+    });
+
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => setOpen(false));
+    }
+
+    if (backdrop) {
+        backdrop.addEventListener('click', () => setOpen(false));
+    }
+
+    // Menutup sheet bila link di dalamnya diklik
+    sheet.addEventListener('click', (event) => {
+        if (event.target.closest('a')) setOpen(false);
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && !sheet.hasAttribute('hidden')) {
+            setOpen(false);
+            toggle.focus();
+        }
+    });
+
+    // Otomatis tutup bila layar di-resize ke desktop
+    window.matchMedia('(min-width: 1024px)').addEventListener('change', (event) => {
+        if (event.matches) setOpen(false);
+    });
+}
+
+/*
  * Reaksi berita: kirim lewat fetch lalu perbarui angka di layar.
  */
 function initBeritaReaction() {
@@ -97,7 +195,70 @@ function initBeritaReaction() {
     });
 }
 
+/*
+ * Slider gambar (x-public.image-slider).
+ *
+ * Semua slide ditumpuk dengan position absolute; yang aktif diberi
+ * opacity-100, sisanya disembunyikan. Mendukung tombol panah, titik
+ * indikator, dan geser (swipe) di layar sentuh.
+ */
+function initImageSliders() {
+    document.querySelectorAll('[data-slider]').forEach((slider) => {
+        const slides = [...slider.querySelectorAll('[data-slider-slide]')];
+        const dots = [...slider.querySelectorAll('[data-slider-dot]')];
+
+        if (slides.length < 2) return;
+
+        let index = 0;
+
+        const show = (next) => {
+            index = (next + slides.length) % slides.length;
+
+            slides.forEach((slide, i) => {
+                const active = i === index;
+                slide.classList.toggle('opacity-100', active);
+                slide.classList.toggle('opacity-0', !active);
+                slide.classList.toggle('pointer-events-none', !active);
+            });
+
+            dots.forEach((dot, i) => {
+                const active = i === index;
+                dot.classList.toggle('w-6', active);
+                dot.classList.toggle('bg-white', active);
+                dot.classList.toggle('w-2', !active);
+                dot.classList.toggle('bg-white/50', !active);
+            });
+        };
+
+        slider.querySelector('[data-slider-prev]')?.addEventListener('click', () => show(index - 1));
+        slider.querySelector('[data-slider-next]')?.addEventListener('click', () => show(index + 1));
+
+        dots.forEach((dot, i) => dot.addEventListener('click', () => show(i)));
+
+        // Geser (swipe) untuk layar sentuh.
+        let startX = 0;
+        let deltaX = 0;
+
+        slider.addEventListener('touchstart', (event) => {
+            startX = event.touches[0].clientX;
+            deltaX = 0;
+        }, { passive: true });
+
+        slider.addEventListener('touchmove', (event) => {
+            deltaX = event.touches[0].clientX - startX;
+        }, { passive: true });
+
+        slider.addEventListener('touchend', () => {
+            if (Math.abs(deltaX) < 45) return;
+            show(deltaX < 0 ? index + 1 : index - 1);
+        });
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     initStickyNavbar();
+    initMobileSearch();
+    initMobileBottomSheet();
     initBeritaReaction();
+    initImageSliders();
 });

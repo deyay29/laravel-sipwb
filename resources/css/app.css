@@ -1,5 +1,11 @@
-@import "tailwindcss";
+/*
+ * Urutan import WAJIB: seluruh @import harus berada sebelum @layer/@theme.
+ * Kalau Google Fonts diletakkan setelah `@import "tailwindcss"`, Vite
+ * menolaknya dengan "must precede all rules" sehingga font fallback saja
+ * yang terpakai. Theme token tetap ditulis setelah import.
+ */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap');
+@import "tailwindcss";
 
 /*
  * Design token portal Bandung Info Center.
@@ -9,14 +15,25 @@
     --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
     --font-display: 'Outfit', 'Inter', ui-sans-serif, system-ui, sans-serif;
 
-    /* Biru utama (tombol, tautan aktif) */
-    --color-brand-50: #eff6ff;
-    --color-brand-100: #dbeafe;
-    --color-brand-200: #bfdbfe;
-    --color-brand-500: #3b82f6;
-    --color-brand-600: #2563eb;
-    --color-brand-700: #1d4ed8;
-    --color-brand-800: #1e40af;
+    /*
+     * Brand = warna utama portal, diselaraskan ke palet navy yang sama
+     * dengan navbar. Semua tombol, badge, link, dan kartu berwarna memakai
+     * token ini, jadi mengubahnya di sini langsung berlaku serempak di
+     * seluruh halaman tanpa menyentuh class satu per satu.
+     *
+     * Skala tetap punya rasio lightness yang sama seperti sebelumnya
+     * (50 paling muda -> 800 paling tua) supaya badge terang tetap
+     * terbaca dan teks gelap di atas brand-50 tetap kontras.
+     */
+    --color-brand-50: #eef2fb;
+    --color-brand-100: #dce4f5;
+    --color-brand-200: #bcc9e6;
+    --color-brand-300: #9dafd4;
+    --color-brand-400: #7b90c2;
+    --color-brand-500: #4a63a8;
+    --color-brand-600: #2541a0;
+    --color-brand-700: #1e3a8a;
+    --color-brand-800: #1a2a6c;
 
     /* Navy (sidebar admin, hero) */
     --color-navy-600: #2541a0;

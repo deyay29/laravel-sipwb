@@ -12,72 +12,55 @@
 @endphp
 
 {{-- ============ HERO ============ --}}
-<section class="relative isolate overflow-hidden bg-navy-900">
- <x-public.media
- src="images/beranda.png"
- alt=""
- icon="fa-city"
- tone="navy"
- ratio="absolute inset-0 -z-20 h-full w-full"
- class="!object-cover"
- />
- <div class="absolute inset-0 -z-10 bg-gradient-to-r from-navy-900/95 via-navy-800/80 to-navy-900/60"></div>
- <div class="absolute inset-0 -z-10 bg-gradient-to-t from-navy-900/80 via-transparent to-navy-900/50"></div>
-
- <div class="mx-auto flex max-w-[1400px] flex-wrap items-center gap-10 px-5 pb-40 pt-36 lg:px-8 lg:pb-44 lg:pt-44">
- <div class="max-w-xl">
- <p class="text-sm font-medium text-white/80">Selamat Datang di</p>
-
- <h1 class="mt-2 font-display text-4xl font-extrabold leading-tight text-white sm:text-5xl lg:text-6xl">
- Bandung Info Center
- </h1>
-
- <p class="mt-5 text-base leading-relaxed text-white/85">
- Portal Layanan Informasi Publik Kota Bandung untuk penyediaan
- informasi Wisata, Sejarah, kuliner &amp; Berita terkini untuk
- pengunjung &amp; masyarakat.
- </p>
- </div>
-
-    {{-- Kartu cuaca: komponen yang sama dipakai di halaman kuliner --}}
-    <x-public.weather-card
-        variant="glass"
-        class="ml-auto hidden w-auto lg:block"
-        :weather="$weather"
-        :rekomendasi="$suhuKategori"
-    />
- </div>
- </div>
- </div>
-</section>
+{{-- Pakai komponen yang sama dengan halaman lain supaya tinggi, rasio, dan
+     ukuran background seragam. Kartu cuaca lewat slot aside. --}}
+<x-public.page-hero
+    title="Bandung Info Center"
+    subtitle="Portal Layanan Informasi Publik Kota Bandung untuk penyediaan informasi Wisata, Sejarah, kuliner & Berita terkini untuk pengunjung & masyarakat."
+    image="images/beranda.png"
+    :breadcrumb="['Beranda' => null]"
+>
+    <x-slot:aside>
+        <x-public.weather-card
+            variant="glass"
+            :weather="$weather"
+            :rekomendasi="$suhuKategori"
+        />
+    </x-slot:aside>
+</x-public.page-hero>
 
 {{-- ============ KARTU KATEGORI (melayang di atas hero) ============ --}}
-<section class="relative z-10 mx-auto -mt-28 max-w-[1400px] px-5 lg:-mt-32 lg:px-8">
- <div class="grid grid-cols-2 gap-4 rounded-3xl border border-slate-200 bg-white p-4 shadow-[0_20px_50px_rgba(15,23,42,0.12)] sm:grid-cols-3 lg:grid-cols-5">
- @foreach ([
- ['label' => 'Wisata', 'route' => 'public.wisata', 'icon' => 'fa-image', 'desc' => 'Destinasi unggulan'],
- ['label' => 'Sejarah', 'route' => 'public.sejarah', 'icon' => 'fa-landmark', 'desc' => 'Arsip & museum'],
- ['label' => 'Berita', 'route' => 'public.berita', 'icon' => 'fa-newspaper', 'desc' => 'Kabar terkini'],
- ['label' => 'Kuliner', 'route' => 'public.kuliner', 'icon' => 'fa-utensils', 'desc' => 'Khas Bandung'],
- ['label' => 'Kontak', 'route' => 'public.kontak', 'icon' => 'fa-headset', 'desc' => 'Hubungi kami'],
- ] as $kategori)
- <a href="{{ route($kategori['route']) }}"
- class="group flex flex-col items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-7 transition hover:border-brand-500 hover:shadow-[0_12px_28px_rgba(37,99,235,0.16)]">
- <span class="grid h-14 w-14 place-items-center rounded-2xl border-2 border-brand-600 text-xl text-brand-700 transition group-hover:bg-brand-600 group-hover:text-white">
- <i class="fas {{ $kategori['icon'] }}"></i>
- </span>
+<section class="relative z-10 mx-auto -mt-10 max-w-[1400px] px-3 sm:-mt-14 sm:px-6 lg:-mt-16 lg:px-8">
+    {{-- auto-fit + auto-fr: kolom menyesuaikan jumlah kartu yang ada dan
+         setiap kartu meregang sama rata mengisi lebar (tidak ada kolom
+         kosong menggantung di sisi kanan). --}}
+    <div class="grid grid-cols-2 gap-1.5 rounded-2xl border border-slate-200 bg-white p-2 shadow-[0_12px_36px_rgba(15,23,42,0.08)] sm:auto-fit sm:grid-cols-[repeat(auto-fit,minmax(11rem,1fr))] sm:gap-3 sm:rounded-3xl sm:p-3 lg:gap-4 lg:p-4">
+        @foreach ([
+            ['label' => 'Wisata', 'target' => '#wisata', 'icon' => 'fa-image', 'desc' => 'Destinasi unggulan'],
+            ['label' => 'Sejarah', 'target' => '#sejarah', 'icon' => 'fa-landmark', 'desc' => 'Arsip & museum'],
+            ['label' => 'Berita', 'target' => '#berita', 'icon' => 'fa-newspaper', 'desc' => 'Kabar terkini'],
+            ['label' => 'Kuliner', 'target' => '#kuliner', 'icon' => 'fa-utensils', 'desc' => 'Khas Bandung'],
+            // {{-- Kontak memakai route, bukan anchor #kontak, karena footer
+            //      penyimpan id="kontak" itu disembunyikan di layar mobile. --}}
+            // ['label' => 'Kontak', 'target' => route('public.kontak'), 'icon' => 'fa-headset', 'desc' => 'Hubungi kami'],
+        ] as $kategori)
+            <a href="{{ $kategori['target'] }}"
+               class="group flex flex-col items-center justify-center gap-1.5 rounded-xl border border-transparent py-2 px-1 text-center transition-all duration-200 hover:border-brand-300 hover:bg-brand-50/40 hover:shadow-sm active:scale-95 sm:gap-2.5 sm:rounded-2xl sm:border-slate-200 sm:bg-white sm:px-3 sm:py-3.5 lg:py-4 sm:hover:border-brand-500 sm:hover:shadow-[0_8px_20px_rgba(37,65,160,0.12)]">
+                <span class="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-brand-200 bg-brand-50 text-sm text-brand-600 transition-all duration-200 group-hover:bg-brand-600 group-hover:text-white sm:h-11 sm:w-11 sm:rounded-xl sm:border-2 sm:border-brand-600 sm:text-base sm:text-brand-700">
+                    <i class="fas {{ $kategori['icon'] }}"></i>
+                </span>
 
- <span class="text-center">
- <span class="block font-display text-sm font-bold text-slate-900">{{ $kategori['label'] }}</span>
- <span class="mt-0.5 block text-[11px] text-slate-400">{{ $kategori['desc'] }}</span>
- </span>
- </a>
- @endforeach
- </div>
+                <span class="text-center">
+                    <span class="block font-display text-[11px] font-bold text-slate-800 transition-colors group-hover:text-brand-700 sm:text-xs lg:text-sm">{{ $kategori['label'] }}</span>
+                    <span class="mt-0.5 hidden text-[11px] text-slate-400 sm:block">{{ $kategori['desc'] }}</span>
+                </span>
+            </a>
+        @endforeach
+    </div>
 </section>
 
 {{-- ============ REKOMENDASI KULINER ============ --}}
-<section class="mx-auto max-w-[1400px] px-5 py-16 lg:px-8">
+<section id="kuliner" class="scroll-mt-20 lg:scroll-mt-24 mx-auto max-w-[1400px] px-5 py-16 lg:px-8">
     <x-public.section-header
         title="Rekomendasi Kuliner"
         highlight="(Berdasarkan Suhu {{ $labelSuhu }})"
@@ -114,7 +97,7 @@
 </section>
 
 {{-- ============ BERITA TERBARU ============ --}}
-<section class="bg-white py-16">
+<section id="berita" class="scroll-mt-20 lg:scroll-mt-24 bg-white py-16">
     <div class="mx-auto max-w-[1400px] px-5 lg:px-8">
         <x-public.section-header
             title="Berita Terbaru"
@@ -150,7 +133,7 @@
 </section>
 
 {{-- ============ WISATA PILIHAN ============ --}}
-<section class="mx-auto max-w-[1400px] px-5 py-16 lg:px-8">
+<section id="wisata" class="scroll-mt-20 lg:scroll-mt-24 mx-auto max-w-[1400px] px-5 py-16 lg:px-8">
     <x-public.section-header
         title="Wisata Pilihan"
         description="Destinasi ikonik dari seluruh penjuru kota."
@@ -184,7 +167,7 @@
 </section>
 
 {{-- ============ SEJARAH ============ --}}
-<section class="bg-navy-800 py-16">
+<section id="sejarah" class="scroll-mt-20 lg:scroll-mt-24 bg-navy-800 py-16">
     <div class="mx-auto max-w-[1400px] px-5 lg:px-8">
         <x-public.section-header
             tone="dark"
@@ -231,7 +214,7 @@
  </div>
 
  <a href="{{ route('public.smart-budget') }}"
- class="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-navy-800 to-brand-600 px-8 py-4 font-display text-sm font-bold text-white transition hover:shadow-xl">
+ class="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-navy-800 to-brand-600 px-8 py-4 font-display text-sm font-bold text-white transition duration-200 hover:-translate-y-0.5 hover:from-navy-900 hover:to-brand-700 hover:shadow-xl active:translate-y-0">
  Buka Smart Budget
  <i class="fas fa-wallet text-xs"></i>
  </a>

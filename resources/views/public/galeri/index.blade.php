@@ -10,7 +10,7 @@
     :breadcrumb="['Beranda' => route('home'), 'Galeri' => null]"
 />
 
-<section class="mx-auto max-w-7xl px-4 py-14 sm:px-6">
+<section class="mx-auto max-w-[1400px] px-4 py-14 sm:px-6">
     @php
         $kategoris = App\Models\Galeri::query()
             ->whereNotNull('kategori_objek')
@@ -27,7 +27,7 @@
             <a href="{{ route('public.galeri') }}"
                @class([
                    'rounded-full px-5 py-2.5 font-display text-sm font-semibold transition',
-                   'bg-brand-600 text-white shadow-[0_4px_14px_rgba(37,99,235,0.3)]' => ! request()->filled('kategori'),
+                   'bg-brand-600 text-white shadow-[0_4px_14px_rgba(37,65,160,0.3)]' => ! request()->filled('kategori'),
                    'border border-slate-200 bg-white text-slate-600 hover:border-brand-500 hover:text-brand-700' => request()->filled('kategori'),
                ])>
                 Semua
@@ -37,7 +37,7 @@
                 <a href="{{ route('public.galeri', ['kategori' => $kategori]) }}"
                    @class([
                        'rounded-full px-5 py-2.5 font-display text-sm font-semibold transition',
-                       'bg-brand-600 text-white shadow-[0_4px_14px_rgba(37,99,235,0.3)]' => request('kategori') === $kategori,
+                       'bg-brand-600 text-white shadow-[0_4px_14px_rgba(37,65,160,0.3)]' => request('kategori') === $kategori,
                        'border border-slate-200 bg-white text-slate-600 hover:border-brand-500 hover:text-brand-700' => request('kategori') !== $kategori,
                    ])>
                     {{ $kategori }}

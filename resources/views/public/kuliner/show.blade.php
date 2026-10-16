@@ -4,11 +4,29 @@
 @section('description', Str::limit(strip_tags($kuliner->deskripsi), 160))
 
 @section('content')
-@php $menghangatkan = $kuliner->kategori_suhu === \App\Models\Kuliner::SUHU_MENGHANGATKAN; @endphp
+@php
+    $menghangatkan = $kuliner->kategori_suhu === \App\Models\Kuliner::SUHU_MENGHANGATKAN;
+
+    /*
+     * Foto untuk slider: gabungkan foto utama kuliner dengan foto galeri
+     * kategori "Kuliner". Kalau hanya ada satu, komponen merender gambar
+     * tunggal tanpa tombol panah.
+     */
+    $fotoSlider = collect([
+        ['src' => $kuliner->foto, 'alt' => $kuliner->nama_kuliner],
+    ])->merge(
+        App\Models\Galeri::query()
+            ->where('kategori_objek', 'like', '%Kuliner%')
+            ->get()
+            ->map(fn ($g) => ['src' => $g->file_gambar, 'alt' => $g->judul])
+    )->values()->all();
+
+    // Peta: dari link/koordinat bila ada, fallback ke alamat teks.
+    $petaUrl = App\Support\MapEmbed::toEmbedUrl($kuliner->alamat_lengkap);
+@endphp
 
 <x-public.page-hero
  :title="$kuliner->nama_kuliner"
- :image="$kuliner->foto"
  :breadcrumb="[
  'Beranda' => route('home'),
  'Kuliner' => route('public.kuliner'),
@@ -16,7 +34,7 @@
  ]"
 />
 
-<section class="mx-auto max-w-7xl px-4 py-12 sm:px-6">
+<section class="mx-auto max-w-[1400px] px-4 py-12 sm:px-6">
  <a href="{{ route('public.kuliner') }}"
  class="mb-8 inline-flex items-center gap-2 font-display text-sm font-semibold text-brand-700 transition hover:text-brand-800">
  <i class="fas fa-arrow-left text-xs"></i>
@@ -26,16 +44,26 @@
  <div class="grid gap-10 lg:grid-cols-5">
  {{-- Kolom kiri --}}
  <aside class="space-y-5 lg:col-span-2">
- <x-public.media
- :src="$kuliner->foto"
- :alt="$kuliner->nama_kuliner"
+ <x-public.image-slider
+ :images="$fotoSlider"
  icon="fa-utensils"
  tone="amber"
  ratio="aspect-[4/3]"
- class="rounded-2xl border-4 border-brand-600 shadow-[0_10px_28px_rgba(37,99,235,0.22)]"
+ class="shadow-[0_4px_20px_rgba(15,23,42,0.10)]"
  />
 
- @if ($kuliner->alamat_lengkap)
+ {{-- Peta: iframe embed resmi Google Maps, tanpa API key. --}}
+ @if ($petaUrl)
+ <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_2px_16px_rgba(15,23,42,0.06)]">
+ <iframe
+ src="{{ $petaUrl }}"
+ title="Peta lokasi {{ $kuliner->nama_kuliner }}"
+ class="h-72 w-full border-0"
+ loading="lazy"
+ referrerpolicy="no-referrer-when-downgrade"
+ allowfullscreen></iframe>
+ </div>
+ @elseif ($kuliner->alamat_lengkap)
  <div class="relative overflow-hidden rounded-2xl border border-slate-200">
  <div class="grid h-52 place-items-center bg-gradient-to-br from-slate-100 to-slate-200">
  <i class="fas fa-map-location-dot text-4xl text-slate-300"></i>
