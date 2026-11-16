@@ -6,18 +6,21 @@
 @section('content')
 @php
     /*
-     * Foto untuk slider: gabungkan foto utama wisata dengan foto galeri
-     * kategori "Wisata". Kalau hanya ada satu, komponen merender gambar
-     * tunggal tanpa tombol panah.
+     * Foto untuk slider: semua foto wisata (sampul + album upload admin),
+     * lalu dilengkapi foto galeri kategori "Wisata". Kalau hanya ada satu,
+     * komponen merender gambar tunggal tanpa tombol panah.
      */
-    $fotoSlider = collect([
-        ['src' => $wisata->gambar, 'alt' => $wisata->nama_wisata],
-    ])->merge(
-        App\Models\Galeri::query()
-            ->where('kategori_objek', 'like', '%Wisata%')
-            ->get()
-            ->map(fn ($g) => ['src' => $g->file_gambar, 'alt' => $g->judul])
-    )->values()->all();
+    $fotoSlider = collect($wisata->semuaFoto())
+        ->map(fn ($src) => ['src' => $src, 'alt' => $wisata->nama_wisata])
+        ->merge(
+            App\Models\Galeri::query()
+                ->where('kategori_objek', 'like', '%Wisata%')
+                ->get()
+                ->map(fn ($g) => ['src' => $g->file_gambar, 'alt' => $g->judul])
+        )
+        ->unique('src')
+        ->values()
+        ->all();
 
     // Peta: dari link/koordinat bila ada, fallback ke alamat teks.
     $petaUrl = App\Support\MapEmbed::toEmbedUrl($wisata->lokasi);
@@ -33,11 +36,15 @@
 />
 
 <section class="mx-auto max-w-[1400px] px-4 py-12 sm:px-6">
- <a href="{{ route('public.wisata') }}"
- class="mb-8 inline-flex items-center gap-2 font-display text-sm font-semibold text-brand-700 transition hover:text-brand-800">
- <i class="fas fa-arrow-left text-xs"></i>
- Kembali ke daftar wisata
- </a>
+ <div class="mb-8 flex flex-wrap items-center justify-between gap-4">
+  <a href="{{ route('public.wisata') }}"
+  class="inline-flex items-center gap-2 font-display text-sm font-semibold text-brand-700 transition hover:text-brand-800">
+  <i class="fas fa-arrow-left text-xs"></i>
+  Kembali ke daftar wisata
+  </a>
+
+  <x-public.share-buttons :title="$wisata->nama_wisata" />
+ </div>
 
  <div class="grid gap-10 lg:grid-cols-5">
  {{-- Kolom kiri: gambar + info ringkas --}}
@@ -142,8 +149,13 @@
  <div>
  <p class="font-display text-sm font-bold text-amber-900">Kuis tersedia</p>
  <p class="mt-1 text-xs leading-relaxed text-amber-800">
- Destinasi ini punya kuis interaktif untuk menguji pengetahuan pengunjung.
+ Destinasi ini punya kuis interaktif untuk menguji wawasan pengunjung dan meraih sertifikat!
  </p>
+ <a href="{{ route('public.wisata') }}#quiz"
+ class="mt-3 inline-flex items-center gap-1.5 font-display text-xs font-bold text-brand-700 hover:text-brand-800 transition">
+ <span>Mulai Kuis Wisata (+10 Poin / Soal)</span>
+ <i class="fas fa-arrow-right text-[10px]"></i>
+ </a>
  </div>
  </div>
  @endif
@@ -156,6 +168,32 @@
  <div class="mt-4 text-[1.02rem] leading-[1.9] text-slate-700">
  {!! nl2br(e($wisata->deskripsi)) !!}
  </div>
+
+ {{-- Galeri: semua foto yang diunggah admin, ditampilkan sekaligus. --}}
+ @if (count($fotoSlider) > 1)
+ <div class="mt-10">
+ <h2 class="font-display text-xl font-extrabold text-slate-900">Galeri Foto</h2>
+ <p class="mt-1 text-sm text-slate-500">{{ count($fotoSlider) }} foto tersedia.</p>
+
+ <div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+ @foreach ($fotoSlider as $foto)
+ @php
+ $fotoUrl = App\Support\Media::url($foto['src'] ?? null);
+ @endphp
+
+ @if ($fotoUrl)
+ <figure class="overflow-hidden rounded-xl border border-slate-200 bg-white">
+ <img src="{{ $fotoUrl }}"
+ alt="{{ $foto['alt'] ?? $wisata->nama_wisata }}"
+ loading="lazy"
+ decoding="async"
+ class="aspect-[4/3] w-full object-cover transition duration-500 hover:scale-105">
+ </figure>
+ @endif
+ @endforeach
+ </div>
+ </div>
+ @endif
 
  <div class="mt-10 grid gap-5 md:grid-cols-2">
  <div class="rounded-2xl border border-slate-200 bg-white p-6">

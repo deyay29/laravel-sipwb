@@ -21,6 +21,7 @@ class WisataFactory extends Factory
             'nama_wisata' => $nama,
             'slug' => Str::slug($nama),
             'kategori' => fake()->randomElement(['Alam', 'Museum', 'Budaya', 'Ikon & Sejarah']),
+            'kategori_budget' => fake()->randomElement(array_keys(Wisata::BUDGET_TIERS)),
             'lokasi' => fake()->city().', Bandung',
             'deskripsi' => fake()->paragraph(),
             'harga_tiket' => fake()->numberBetween(0, 50000),

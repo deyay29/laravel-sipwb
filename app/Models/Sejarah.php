@@ -22,6 +22,9 @@ class Sejarah extends Model
         'slug',
         'ringkasan',
         'gambar_utama',
+        'video_storytelling',
+        'notebook',
+        'gambar_flipbook',
     ];
 
     /**

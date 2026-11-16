@@ -33,6 +33,14 @@ class Galeri extends Model
     }
 
     /**
+     * URL publik memakai slug, sama seperti wisata/kuliner/berita/sejarah.
+     */
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
+
+    /**
      * Admin yang mengunggah foto ini.
      */
     public function user(): BelongsTo

@@ -27,6 +27,22 @@
  <span class="absolute left-4 top-4 rounded-full bg-slate-900/70 px-3 py-1 text-[11px] font-bold text-white backdrop-blur">
  {{ $topik->babs_count }} bab
  </span>
+
+ @if ($topik->video_storytelling || $topik->notebook)
+ <span class="absolute bottom-3 left-4 flex flex-wrap gap-1.5">
+ @if ($topik->video_storytelling)
+ <span class="inline-flex items-center gap-1 rounded-full bg-violet-600/90 px-2.5 py-1 text-[10px] font-bold text-white backdrop-blur">
+ <i class="fas fa-video text-[9px]"></i> Video
+ </span>
+ @endif
+
+  @if ($topik->notebook)
+  <span class="inline-flex items-center gap-1 rounded-full bg-brand-600/90 px-2.5 py-1 text-[10px] font-bold text-white backdrop-blur">
+  <i class="fas fa-book-open text-[9px]"></i> Flipbook
+  </span>
+  @endif
+ </span>
+ @endif
  </a>
 
  <div class="flex flex-1 flex-col p-6">

@@ -16,6 +16,98 @@ use Illuminate\Support\Str;
 final class MapEmbed
 {
     /**
+     * Domain yang boleh jadi sumber iframe.
+     *
+     * Kenapa perlu daftar putih: nilai peta dari panel admin dirender sebagai
+     * HTML mentah. Tanpa whitelist, siapa pun yang bisa menempel kode di panel
+     * admin bisa menyisipkan <script> atau iframe dari domain lain.
+     */
+    private const ALLOWED_HOSTS = [
+        'google.com',
+        'www.google.com',
+        'maps.google.com',
+        'google.co.id',
+        'www.google.co.id',
+        'maps.google.co.id',
+    ];
+
+    /**
+     * Ubah nilai peta dari admin menjadi markup <iframe> yang aman.
+     *
+     * Menerima dua bentuk input:
+     *   1. Kode <iframe> Google Maps (dari menu "Share > Embed a map")
+     *      -> src diambil, lalu iframe dibangun ulang dari nol.
+     *   2. URL biasa, koordinat, atau alamat teks
+     *      -> dinormalisasi jadi URL embed lebih dulu.
+     *
+     * Hasilnya SELALU iframe bersih: atribut dan isi lain dari input dibuang,
+     * sehingga tidak ada markup berbahaya yang ikut terbawa.
+     *
+     * @return string|null markup iframe, atau null kalau tidak bisa ditampilkan
+     */
+    public static function toSafeIframe(?string $value): ?string
+    {
+        $url = static::resolveSourceUrl($value);
+
+        if ($url === null) {
+            return null;
+        }
+
+        return '<iframe src="'.e($url).'" loading="lazy"'
+            .' referrerpolicy="no-referrer-when-downgrade"'
+            .' style="width:100%;height:100%;min-height:380px;border:0"'
+            .' allowfullscreen></iframe>';
+    }
+
+    /**
+     * Ambil URL embed yang valid dari berbagai bentuk input.
+     */
+    protected static function resolveSourceUrl(?string $value): ?string
+    {
+        if (blank($value)) {
+            return null;
+        }
+
+        $value = trim($value);
+
+        // Bentuk 1: sudah berupa kode <iframe> -> ambil src saja.
+        if (str_contains($value, '<iframe')) {
+            $pattern = '/<iframe[^>]*\ssrc\s*=\s*(["\'])(.*?)\1/is';
+
+            if (! preg_match($pattern, $value, $m)) {
+                return null;
+            }
+
+            $src = html_entity_decode(trim($m[2]), ENT_QUOTES);
+
+            return static::isAllowedHost($src) ? $src : null;
+        }
+
+        // Bentuk 2: URL biasa / koordinat / alamat teks.
+        $url = static::toEmbedUrl($value);
+
+        return static::isAllowedHost($url) ? $url : null;
+    }
+
+    /**
+     * Pastikan URL memakai domain Google Maps yang diizinkan (https saja).
+     */
+    protected static function isAllowedHost(?string $url): bool
+    {
+        if (! is_string($url) || $url === '') {
+            return false;
+        }
+
+        $host = parse_url($url, PHP_URL_HOST);
+        $scheme = strtolower((string) parse_url($url, PHP_URL_SCHEME));
+
+        if (! $host || $scheme !== 'https') {
+            return false;
+        }
+
+        return in_array(strtolower($host), self::ALLOWED_HOSTS, true);
+    }
+    /**
      * Ubah link Google Maps apa pun menjadi URL yang bisa di-embed lewat
      * iframe, atau null kalau tidak bisa dibaca.
      *

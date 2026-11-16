@@ -13,7 +13,7 @@
     <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_2px_16px_rgba(26,42,108,0.08)] lg:p-8">
         <h1 class="font-display text-xl font-extrabold text-slate-800">{{ isset($berita) ? 'Edit Berita' : 'Tambah Berita' }}</h1>
 
-        <form action="{{ isset($berita) ? route('admin.berita.update', $berita) : route('admin.berita.store') }}" method="POST" class="mt-6 space-y-5">
+        <form action="{{ isset($berita) ? route('admin.berita.update', $berita) : route('admin.berita.store') }}" method="POST" enctype="multipart/form-data" class="mt-6 space-y-5">
             @csrf
             @isset($berita)
                 @method('PUT')
@@ -54,26 +54,107 @@
             </div>
             <div>
                 <label for="gambar" class="mb-1.5 block font-display text-sm font-semibold text-slate-700">
-                    Path Gambar
+                    Gambar Sampul
                 </label>
-                <input type="text"
+
+                @if (isset($berita) && $berita->gambar)
+                    <div class="mb-3 flex flex-wrap items-center gap-4 rounded-xl border border-slate-200 bg-slate-50 p-3">
+                        <div class="h-24 w-36 shrink-0 overflow-hidden rounded-lg border border-slate-200">
+                            <x-public.media :src="$berita->gambar" :alt="$berita->judul" icon="fa-newspaper"
+                                tone="brand" ratio="h-24" />
+                        </div>
+
+                        <div class="min-w-0 flex-1">
+                            <p class="text-xs font-semibold text-slate-600">Gambar saat ini</p>
+                            <p class="mt-1 truncate text-[11px] text-slate-400">{{ $berita->gambar }}</p>
+
+                            <label class="mt-2 inline-flex cursor-pointer items-center gap-2 text-xs font-semibold text-rose-600">
+                                <input type="checkbox"
+                                       name="hapus_gambar"
+                                       value="1"
+                                       class="h-3.5 w-3.5 rounded border-slate-300 text-rose-600 focus:ring-rose-500">
+                                Hapus gambar ini
+                            </label>
+                        </div>
+                    </div>
+                @endif
+
+                <input type="file"
                        id="gambar"
                        name="gambar"
-                       value="{{ old('gambar', $berita->gambar ?? '') }}"
-                       
-                       class="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20">
+                       accept="image/jpeg,image/png,image/webp"
+                       class="block w-full cursor-pointer rounded-xl border border-dashed border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-600 outline-none transition file:mr-4 file:rounded-lg file:border-0 file:bg-brand-600 file:px-4 file:py-2 file:font-display file:text-sm file:font-semibold file:text-white hover:file:bg-brand-700 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20">
+                <p class="mt-1.5 text-xs text-slate-400">
+                    Format JPG, PNG, atau WebP, maksimal 4 MB. Kosongkan bila tidak ingin mengganti gambar.
+                </p>
+
+                @error('gambar')
+                    <p class="mt-1.5 text-xs font-semibold text-rose-600">{{ $message }}</p>
+                @enderror
+
+                <div id="gambar-preview" class="mt-3 hidden overflow-hidden rounded-xl border border-slate-200">
+                    <img id="gambar-preview-img" src="" alt="Preview gambar baru" class="h-40 w-full object-cover">
+                </div>
             </div>
             <div>
-                <label for="audio_url" class="mb-1.5 block font-display text-sm font-semibold text-slate-700">
-                    URL Audio
+                <label for="audio" class="mb-1.5 block font-display text-sm font-semibold text-slate-700">
+                    Audio Berita
                 </label>
-                <input type="text"
-                       id="audio_url"
-                       name="audio_url"
-                       value="{{ old('audio_url', $berita->audio_url ?? '') }}"
-                       
-                       class="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20">
-                <p class="mt-1.5 text-xs text-slate-400">URL file audio berita, boleh dikosongkan.</p>
+
+                @if (isset($berita) && $berita->audio_url)
+                    @php
+                        $audioLama = App\Support\Media::url($berita->audio_url);
+                    @endphp
+
+                    <div class="mb-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
+                        <p class="mb-2 text-xs font-semibold text-slate-600">Audio saat ini</p>
+
+                        @if ($audioLama)
+                            <audio controls preload="none" class="w-full">
+                                <source src="{{ $audioLama }}">
+                                Browser Anda tidak mendukung pemutar audio.
+                            </audio>
+                        @else
+                            <p class="truncate text-[11px] text-slate-400">{{ $berita->audio_url }}</p>
+                        @endif
+
+                        <label class="mt-2 inline-flex cursor-pointer items-center gap-2 text-xs font-semibold text-rose-600">
+                            <input type="checkbox"
+                                   name="hapus_audio"
+                                   value="1"
+                                   class="h-3.5 w-3.5 rounded border-slate-300 text-rose-600 focus:ring-rose-500">
+                            Hapus audio ini
+                        </label>
+                    </div>
+                @endif
+
+                <input type="file"
+                       id="audio"
+                       name="audio"
+                       accept="audio/mpeg,audio/mp3,audio/wav,audio/ogg,audio/mp4,audio/aac"
+                       class="block w-full cursor-pointer rounded-xl border border-dashed border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-600 outline-none transition file:mr-4 file:rounded-lg file:border-0 file:bg-violet-600 file:px-4 file:py-2 file:font-display file:text-sm file:font-semibold file:text-white hover:file:bg-violet-700 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20">
+                <p class="mt-1.5 text-xs text-slate-400">
+                    Format MP3, WAV, OGG, M4A, atau AAC, maksimal 10 MB.
+                </p>
+
+                @error('audio')
+                    <p class="mt-1.5 text-xs font-semibold text-rose-600">{{ $message }}</p>
+                @enderror
+
+                <div class="mt-3">
+                    <label for="audio_url" class="mb-1.5 block font-display text-xs font-semibold text-slate-600">
+                        Atau URL Audio
+                    </label>
+                    <input type="text"
+                           id="audio_url"
+                           name="audio_url"
+                           value="{{ old('audio_url', isset($berita) && $berita->audio_url && Str::startsWith($berita->audio_url, ['http://', 'https://']) ? $berita->audio_url : '') }}"
+                           placeholder="https://contoh.com/audio.mp3"
+                           class="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20">
+                    <p class="mt-1.5 text-xs text-slate-400">
+                        Boleh dikosongkan. Jika memilih file upload sekaligus mengisi URL, file upload yang dipakai.
+                    </p>
+                </div>
             </div>
             <div>
                 <label for="tanggal" class="mb-1.5 block font-display text-sm font-semibold text-slate-700">
@@ -103,3 +184,30 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const input = document.getElementById('gambar');
+        const preview = document.getElementById('gambar-preview');
+        const image = document.getElementById('gambar-preview-img');
+
+        if (!input || !preview || !image) {
+            return;
+        }
+
+        input.addEventListener('change', function () {
+            const file = input.files && input.files[0];
+
+            if (!file) {
+                preview.classList.add('hidden');
+                image.src = '';
+                return;
+            }
+
+            image.src = URL.createObjectURL(file);
+            preview.classList.remove('hidden');
+        });
+    });
+</script>
+@endpush

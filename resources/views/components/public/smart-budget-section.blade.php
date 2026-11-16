@@ -22,7 +22,7 @@
     $daftar = collect($pakets);
 @endphp
 
-<section id="smart-budget" {{ $attributes->merge(['class' => 'mt-14 scroll-mt-28']) }}>
+<section id="smart-budget" {{ $attributes->merge(['class' => 'scroll-mt-28']) }}>
     <h2 class="font-display text-2xl font-extrabold text-slate-900">{{ $judul }}</h2>
     <p class="mt-1 text-sm text-slate-500">
         Perkiraan biaya perjalanan di Kota Bandung, disusun agar mudah dibaca.

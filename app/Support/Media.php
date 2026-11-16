@@ -40,8 +40,11 @@ final class Media
             return asset($path);
         }
 
-        // 2. Berada di storage/app/public dan sudah dikuantkan lewat symlink.
-        if (is_file(storage_path('app/public/'.$path)) && is_link(public_path('storage'))) {
+        // 2. Berada di storage/app/public dan sudah bisa diakses lewat symlink
+        //    public/storage. Pengecekan memakai is_file() pada path publik,
+        //    bukan is_link(), karena is_link() bisa mengembalikan false untuk
+        //    symlink/junction di Windows meskipun tautannya tetap berfungsi.
+        if (is_file(storage_path('app/public/'.$path)) && is_file(public_path('storage/'.$path))) {
             return asset('storage/'.$path);
         }
 

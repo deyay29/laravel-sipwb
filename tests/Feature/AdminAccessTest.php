@@ -56,6 +56,18 @@ class AdminAccessTest extends TestCase
         }
     }
 
+    public function test_tombol_tambah_di_halaman_kelola_mengarah_ke_form_create(): void
+    {
+        $admin = User::factory()->admin()->create();
+
+        foreach (['berita', 'kuliner', 'wisata', 'sejarah', 'galeri'] as $module) {
+            $this->actingAs($admin)
+                ->get("/admin/{$module}")
+                ->assertOk()
+                ->assertSee(route("admin.{$module}.create"), false);
+        }
+    }
+
     public function test_akun_bukan_admin_tidak_bisa_login(): void
     {
         $user = User::factory()->create(['role' => 'user']);

@@ -26,7 +26,7 @@
     <div class="fixed inset-0 bg-slate-900/50" onclick="this.parentElement.classList.add('hidden')"></div>
     <nav class="fixed inset-y-0 left-0 flex w-[260px] flex-col bg-navy-800 p-4 text-white">
         <div class="mb-4 flex items-center gap-3">
-            <span class="grid h-10 w-10 place-items-center rounded-[10px] bg-accent-500"><i class="fas fa-city"></i></span>
+            <img src="{{ asset('images/logo.png') }}" alt="Bandung Info Center" class="h-10 w-auto">
             <div>
                 <p class="text-sm font-bold">Bandung Info Center</p>
                 <p class="text-[10px] uppercase tracking-[1px] text-accent-500">Panel Admin</p>

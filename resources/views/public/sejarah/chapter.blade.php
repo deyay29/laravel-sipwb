@@ -15,11 +15,15 @@
 />
 
 <section class="mx-auto max-w-[1400px] px-4 py-12 sm:px-6">
-    <a href="{{ route('public.sejarah.show', $topik) }}"
-       class="mb-8 inline-flex items-center gap-2 font-display text-sm font-semibold text-brand-700 transition hover:text-brand-800">
-        <i class="fas fa-arrow-left text-xs"></i>
-        Kembali ke {{ $topik->judul_topik }}
-    </a>
+    <div class="mb-8 flex flex-wrap items-center justify-between gap-4">
+        <a href="{{ route('public.sejarah.show', $topik) }}"
+           class="inline-flex items-center gap-2 font-display text-sm font-semibold text-brand-700 transition hover:text-brand-800">
+            <i class="fas fa-arrow-left text-xs"></i>
+            Kembali ke {{ $topik->judul_topik }}
+        </a>
+
+        <x-public.share-buttons :title="'Bab '.$bab->nomor_bab.' — '.$bab->judul_bab" />
+    </div>
 
     <div class="grid gap-10 lg:grid-cols-4">
         {{-- Daftar bab --}}

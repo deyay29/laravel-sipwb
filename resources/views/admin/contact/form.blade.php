@@ -73,7 +73,10 @@
                       name="map_embed"
                       rows="4"
                       class="w-full rounded-xl border border-slate-200 px-4 py-2.5 font-mono text-xs leading-relaxed outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20">{{ old('map_embed', $contact->map_embed ?? '') }}</textarea>
-            <p class="mt-1.5 text-xs text-slate-400">Tempelkan kode &lt;iframe&gt; dari Google Maps.</p>
+            <p class="mt-1.5 text-xs text-slate-400">
+                Tempelkan <strong>kode &lt;iframe&gt;</strong> dari Google Maps <em>(Share &rsaquo; Embed a map)</em>,
+                atau cukup URL Google Maps / alamat lokasi. Keduanya sama-sama bisa ditampilkan.
+            </p>
         </div>
 
         <div class="flex items-center gap-3 border-t border-slate-100 pt-5">

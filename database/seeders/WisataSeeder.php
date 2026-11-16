@@ -14,6 +14,7 @@ class WisataSeeder extends Seeder
             [
                 'nama_wisata' => 'Gedung Sate',
                 'kategori' => 'Ikon & Sejarah',
+                'kategori_budget' => 'sedang',
                 'lokasi' => 'Jl. Diponegoro No.22, Bandung Wetan',
                 'deskripsi' => 'Nama Gedung Sate berasal dari ornamen di puncak menara yang bentuknya menyerupai tusuk sate. Selain menjadi ikon Kota Bandung, gedung ini dikenal sebagai saksi perjuangan tujuh pemuda yang gugur saat mempertahankan Gedung Sate pada masa kemerdekaan.',
                 'harga_tiket' => 10000,
@@ -24,6 +25,7 @@ class WisataSeeder extends Seeder
             [
                 'nama_wisata' => 'Tangkuban Perahu',
                 'kategori' => 'Alam',
+                'kategori_budget' => 'nyaman',
                 'lokasi' => 'Jl. Raya Tangkuban Parahu, Lembang',
                 'deskripsi' => 'Tangkuban Perahu adalah gunung api aktif dengan bentuk kerucut terpangkas seperti perahu terbalik. Gunung ini menjadi salah satu tujuan alam paling terkenal di Bandung Utara dengan hamparan kawah yang luas.',
                 'harga_tiket' => 25000,
@@ -34,6 +36,7 @@ class WisataSeeder extends Seeder
             [
                 'nama_wisata' => 'Museum Geologi Bandung',
                 'kategori' => 'Museum',
+                'kategori_budget' => 'sedang',
                 'lokasi' => 'Jl. Diponegoro No.57, Bandung Wetan',
                 'deskripsi' => 'Museum Geologi menyimpan berbagai koleksi geologi dan edukasi peninggalan bersejarah, mulai dari fosil, mineral, hingga batuan vulkanik khas Jawa Barat.',
                 'harga_tiket' => 20000,
@@ -44,6 +47,7 @@ class WisataSeeder extends Seeder
             [
                 'nama_wisata' => 'Taman Hutan Raya Bandung',
                 'kategori' => 'Alam',
+                'kategori_budget' => 'nyaman',
                 'lokasi' => 'Jl. Ir. H. Juanda, Dago, Coblong',
                 'deskripsi' => 'Tahura Bandung adalah kawasan hutan kota yang menjadi paru-paru hijau Kota Bandung. Area ini sering digunakan untuk piknik dan jalan-jalan bersama keluarga.',
                 'harga_tiket' => null,
@@ -54,6 +58,7 @@ class WisataSeeder extends Seeder
             [
                 'nama_wisata' => 'Kampung Naga',
                 'kategori' => 'Budaya',
+                'kategori_budget' => 'hemat',
                 'lokasi' => 'Nagawen, Sumedang',
                 'deskripsi' => 'Kampung Naga adalah kampung adat Sunda di lereng Gunung Jayawi yang mempertahankan arsitektur, tradisi, dan adat asli sampai hari ini.',
                 'harga_tiket' => 10000,

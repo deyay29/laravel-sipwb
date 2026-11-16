@@ -24,11 +24,12 @@
  class="w-full object-cover transition duration-500 group-hover:scale-105"
  />
 
- @if ($berita->kategori)
+ @php
+     $kat = strtolower($berita->kategori ?? '') === 'sejarah' ? 'Berita' : ($berita->kategori ?: 'Berita');
+ @endphp
  <span class="absolute left-4 top-4 rounded-full bg-slate-900/70 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-white backdrop-blur">
- {{ $berita->kategori }}
+     {{ $kat }}
  </span>
- @endif
  </a>
 
  <div class="flex flex-1 flex-col p-6">

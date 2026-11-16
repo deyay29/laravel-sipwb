@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Contact;
+use App\Models\ContactMessage;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -42,5 +43,29 @@ class ContactController extends Controller
         return redirect()
             ->route('admin.contact.index')
             ->with('success', 'Data kontak berhasil diperbarui.');
+    }
+
+    /**
+     * Daftar kritik, saran, atau masukan dari pengunjung.
+     *
+     * Menyimpan pesan dari halaman publik tanpa perlu alur balasan admin.
+     */
+    public function indexMessages(): View
+    {
+        $messages = ContactMessage::latest()->paginate(10)->withQueryString();
+
+        return view('admin.contact.messages', compact('messages'));
+    }
+
+    /**
+     * Hapus satu pesan kritik, saran, atau masukan.
+     */
+    public function destroyMessage(ContactMessage $contactMessage): RedirectResponse
+    {
+        $contactMessage->delete();
+
+        return redirect()
+            ->route('admin.contact.messages.index')
+            ->with('success', 'Pesan kritik, saran, atau masukan berhasil dihapus.');
     }
 }

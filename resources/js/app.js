@@ -167,6 +167,48 @@ function initBeritaReaction() {
         const buttons = container.querySelectorAll('[data-tipe]');
         buttons.forEach((b) => { b.disabled = true; });
 
+        const icon = button.querySelector('i');
+        if (icon) {
+            icon.style.transform = 'scale(1.4)';
+            setTimeout(() => {
+                icon.style.transform = 'scale(1)';
+            }, 200);
+        }
+        button.style.transform = 'scale(0.92)';
+        setTimeout(() => {
+            button.style.transform = 'scale(1)';
+        }, 150);
+
+        const ripple = button.querySelector('span:nth-child(2)');
+        if (ripple) {
+            ripple.style.transition = 'none';
+            ripple.style.width = '0';
+            ripple.style.height = '0';
+            ripple.style.opacity = '0.25';
+            void ripple.offsetWidth;
+            ripple.style.transition = 'all 600ms ease-out';
+            ripple.style.width = '220%';
+            ripple.style.height = '220%';
+            ripple.style.opacity = '0';
+            setTimeout(() => {
+                ripple.style.width = '0';
+                ripple.style.height = '0';
+                ripple.style.opacity = '0';
+            }, 650);
+        }
+
+        const glow = button.querySelector('span:first-child');
+        if (glow) {
+            glow.style.boxShadow = '0 0 0 0 currentColor';
+            glow.style.transition = 'none';
+            void glow.offsetWidth;
+            glow.style.transition = 'box-shadow 600ms ease-out';
+            glow.style.boxShadow = '0 0 0 12px transparent';
+            setTimeout(() => {
+                glow.style.boxShadow = '0 0 0 0 transparent';
+            }, 650);
+        }
+
         try {
             const response = await fetch(url, {
                 method: 'POST',
@@ -185,6 +227,11 @@ function initBeritaReaction() {
             Object.entries(result.data).forEach(([key, value]) => {
                 container.querySelectorAll(`[data-kolom="${key}"]`).forEach((el) => {
                     el.textContent = new Intl.NumberFormat('id-ID').format(value);
+                    el.style.transform = 'scale(1.4)';
+                    el.style.transition = 'transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1)';
+                    setTimeout(() => {
+                        el.style.transform = 'scale(1)';
+                    }, 200);
                 });
             });
         } catch (error) {
