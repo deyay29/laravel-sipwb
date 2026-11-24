@@ -83,7 +83,7 @@
                 :title="$kuliner->nama_kuliner"
                 :summary="Str::limit($kuliner->deskripsi, 70)"
                 :meta="[[$kuliner->jam_operasional ? 'far fa-clock' : null, $kuliner->jam_operasional ?? '-']]"
-                :note="$kuliner->harga ? 'Rp'.number_format($kuliner->harga, 0, ',', '.') : null"
+                :note="$kuliner->hargaTampilan() ?: null"
             />
         @empty
             <x-public.empty-state
@@ -109,12 +109,14 @@
         <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             @forelse ($beritas as $berita)
                 <x-public.content-card
+                    variant="brand"
                     :href="route('public.berita.show', $berita)"
                     :src="$berita->gambar"
                     :image-alt="$berita->judul"
                     image-icon="fa-newspaper"
                     image-tone="brand"
                     :badge="$berita->kategori"
+                    badge-tone="bg-white/20 text-white"
                     :title="$berita->judul"
                     :meta="[
                         ['far fa-calendar', $berita->tanggal?->format('d M Y') ?? '-'],
@@ -144,13 +146,14 @@
     <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         @forelse ($wisatas as $wisata)
             <x-public.content-card
+                variant="brand"
                 :href="route('public.wisata.show', $wisata)"
                 :src="$wisata->gambar"
                 :image-alt="$wisata->nama_wisata"
                 image-icon="fa-mountain-sun"
                 image-tone="emerald"
                 :badge="$wisata->kategori"
-                badge-tone="bg-emerald-50 text-emerald-700"
+                badge-tone="bg-white/20 text-white"
                 :title="$wisata->nama_wisata"
                 :summary="Str::limit($wisata->deskripsi, 80)"
                 :meta="[['fas fa-location-dot', $wisata->lokasi ?? 'Bandung']]"
@@ -167,10 +170,10 @@
 </section>
 
 {{-- ============ SEJARAH ============ --}}
-<section id="sejarah" class="scroll-mt-20 lg:scroll-mt-24 bg-navy-800 py-16">
+<section id="sejarah" class="scroll-mt-20 lg:scroll-mt-24 py-16">
     <div class="mx-auto max-w-[1400px] px-5 lg:px-8">
         <x-public.section-header
-            tone="dark"
+            tone="light"
             title="Cerita Sejarah"
             description="Telusuri tonggak perjalanan Kota Bandung."
             :action="route('public.sejarah')"
@@ -180,14 +183,14 @@
         <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             @forelse ($sejarahs as $topik)
                 <x-public.content-card
-                    variant="dark"
+                    variant="brand"
                     :href="route('public.sejarah.show', $topik)"
                     :src="$topik->gambar_utama"
                     :image-alt="$topik->judul_topik"
                     image-icon="fa-landmark"
                     image-tone="violet"
                     badge="{{ $topik->babs_count }} bab"
-                    badge-tone="bg-white/15 text-white"
+                    badge-tone="bg-white/20 text-white"
                     :title="$topik->judul_topik"
                     :summary="Str::limit($topik->ringkasan, 80)"
                     :meta="[['far fa-calendar', $topik->created_at->format('d M Y')]]"

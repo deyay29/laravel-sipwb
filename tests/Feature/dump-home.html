@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Beranda &middot; Bandung Info Center</title>
+    <meta name="description" content="Portal Layanan Informasi Publik Kota Bandung: berita, wisata, kuliner, sejarah, dan kontak.">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <link rel="preload" as="style" href="http://localhost/build/assets/app-DAWDLvPy.css" /><link rel="modulepreload" as="script" href="http://localhost/build/assets/app-BTjO427f.js" /><link rel="stylesheet" href="http://localhost/build/assets/app-DAWDLvPy.css" /><script type="module" src="http://localhost/build/assets/app-BTjO427f.js"></script>    </head>
+
+<body class="flex min-h-screen flex-col bg-slate-50 font-sans text-slate-900 antialiased pb-20 lg:pb-0">
+    <nav data-sticky-navbar class="fixed inset-x-0 top-0 z-40 w-full transition-colors">
+    
+    <div data-navbar-bg
+         aria-hidden="true"
+         class="pointer-events-none absolute inset-0 -z-10 bg-navy-900/95 backdrop-blur-md"
+         style="opacity: 0"></div>
+
+    <div class="mx-auto flex max-w-[1400px] items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:gap-4 lg:px-8 lg:py-4">
+        
+        <a href="http://localhost" class="flex shrink-0 items-center transition hover:opacity-90">
+            <img src="http://localhost/images/logo.png"
+                 alt="Bandung Info Center"
+                 class="h-10 w-auto sm:h-11 lg:h-12">
+        </a>
+
+        
+        <ul class="hidden flex-1 items-center justify-center gap-1.5 lg:flex">
+                            
+                <li>
+                    <a href="http://localhost"
+                       class="inline-block rounded-full px-5 py-2.5 font-display text-sm font-semibold transition bg-white text-navy-800 shadow-lg">
+                        Beranda
+                    </a>
+                </li>
+                            
+                <li>
+                    <a href="http://localhost/berita"
+                       class="inline-block rounded-full px-5 py-2.5 font-display text-sm font-semibold transition border border-white/30 bg-white/10 text-white backdrop-blur hover:bg-white/20">
+                        Berita
+                    </a>
+                </li>
+                            
+                <li>
+                    <a href="http://localhost/wisata"
+                       class="inline-block rounded-full px-5 py-2.5 font-display text-sm font-semibold transition border border-white/30 bg-white/10 text-white backdrop-blur hover:bg-white/20">
+                        Wisata
+                    </a>
+                </li>
+                            
+                <li>
+                    <a href="http://localhost/kuliner"
+                       class="inline-block rounded-full px-5 py-2.5 font-display text-sm font-semibold transition border border-white/30 bg-white/10 text-white backdrop-blur hover:bg-white/20">
+                        Kuliner
+                    </a>
+                </li>
+                            
+                <li>
+                    <a href="http://localhost/sejarah"
+                       class="inline-block rounded-full px-5 py-2.5 font-display text-sm font-semibold transition border border-white/30 bg-white/10 text-white backdrop-blur hover:bg-white/20">
+                        Sejarah
+                    </a>
+                </li>
+                            
+                <li>
+                    <a href="http://localhost/galeri"
+                       class="inline-block rounded-full px-5 py-2.5 font-display text-sm font-semibold transition border border-white/30 bg-white/10 text-white backdrop-blur hover:bg-white/20">
+                        Galeri
+                    </a>
+                </li>
+                            
+                <li>
+                    <a href="http://localhost/kontak"
+                       class="inline-block rounded-full px-5 py-2.5 font-display text-sm font-semibold transition border border-white/30 bg-white/10 text-white backdrop-blur hover:bg-white/20">
+                        Kontak
+                    </a>
+                </li>
+                    </ul>
+
+        
+        <div class="hidden shrink-0 items-center gap-3 lg:flex">
+            <form action="http://localhost" method="GET" role="search" class="relative">
+                <label for="nav-search-desktop" class="sr-only">Cari informasi</label>
+                <i class="fas fa-magnifying-glass pointer-events-none absolute left-4 top-1/2 z-10 -translate-y-1/2 text-sm text-white/80"></i>
+                <input id="nav-search-desktop"
+                       type="search"
+                       name="q"
+                       value=""
+                       placeholder="Search Here"
+                       class="w-52 rounded-full border border-white/25 bg-white/10 py-2.5 pl-11 pr-4 text-sm text-white placeholder-white/60 outline-none transition focus:w-64 focus:bg-white/20 focus:ring-2 focus:ring-white/30">
+            </form>
+
+                            <a href="http://localhost/login"
+                   class="rounded-full bg-white px-5 py-2.5 font-display text-sm font-semibold text-navy-800 shadow-lg transition hover:bg-brand-600 hover:text-white">
+                    Login
+                </a>
+                    </div>
+
+        
+        <div class="flex items-center gap-2 lg:hidden">
+            
+            <button type="button"
+                    data-mobile-search-toggle
+                    aria-controls="mobile-search-panel"
+                    aria-expanded="false"
+                    aria-label="Cari informasi"
+                    class="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/25 bg-white/10 text-white backdrop-blur transition active:scale-95 hover:bg-white/20">
+                <i class="fas fa-magnifying-glass text-sm"></i>
+            </button>
+
+            
+                            <a href="http://localhost/login"
+                   class="inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 font-display text-xs font-semibold text-navy-800 shadow transition active:scale-95 hover:bg-brand-600 hover:text-white">
+                    <i class="fas fa-arrow-right-to-bracket text-xs"></i>
+                    <span>Masuk</span>
+                </a>
+                    </div>
+    </div>
+
+    
+    <div id="mobile-search-panel"
+         data-mobile-search-bar
+         hidden
+         class="border-t border-white/15 bg-navy-900/98 px-4 py-3 backdrop-blur-xl lg:hidden">
+        <div class="mx-auto max-w-md">
+            <form action="http://localhost" method="GET" role="search" class="relative flex items-center">
+                <label for="nav-search-mobile-input" class="sr-only">Cari informasi</label>
+                <i class="fas fa-magnifying-glass pointer-events-none absolute left-4 text-sm text-white/70"></i>
+                <input id="nav-search-mobile-input"
+                       type="search"
+                       name="q"
+                       value=""
+                       placeholder="Cari wisata, berita, kuliner..."
+                       class="w-full rounded-full border border-white/25 bg-white/10 py-2 pl-11 pr-10 text-sm text-white placeholder-white/60 outline-none transition focus:border-white/50 focus:bg-white/20 focus:ring-2 focus:ring-white/30">
+                <button type="button"
+                        data-mobile-search-close
+                        aria-label="Tutup pencarian"
+                        class="absolute right-3 grid h-7 w-7 place-items-center rounded-full text-white/60 transition hover:bg-white/10 hover:text-white">
+                    <i class="fas fa-xmark text-sm"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+
+
+
+<nav data-bottom-navbar
+     aria-label="Navigasi Bawah Mobile"
+     class="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-navy-900/95 backdrop-blur-xl shadow-[0_-8px_30px_rgba(0,0,0,0.35)] lg:hidden"
+     style="padding-bottom: max(0.375rem, env(safe-area-inset-bottom, 6px));">
+    <div class="mx-auto flex max-w-md items-center justify-around px-2 py-1.5">
+        
+                <a href="http://localhost"
+           class="group flex flex-1 flex-col items-center justify-center py-1 transition-transform active:scale-95">
+            <span class="flex h-7 w-12 items-center justify-center rounded-full transition-all duration-200 bg-white text-navy-900 shadow-md ring-2 ring-white/40">
+                <i class="fas fa-house text-sm"></i>
+            </span>
+            <span class="mt-1 font-display text-[11px] leading-tight transition-colors font-bold text-white">
+                Beranda
+            </span>
+        </a>
+
+        
+                <a href="http://localhost/wisata"
+           class="group flex flex-1 flex-col items-center justify-center py-1 transition-transform active:scale-95">
+            <span class="flex h-7 w-12 items-center justify-center rounded-full transition-all duration-200 text-white/70 group-hover:text-white">
+                <i class="fas fa-mountain-sun text-sm"></i>
+            </span>
+            <span class="mt-1 font-display text-[11px] leading-tight transition-colors font-medium text-white/70 group-hover:text-white">
+                Wisata
+            </span>
+        </a>
+
+        
+                <a href="http://localhost/kuliner"
+           class="group flex flex-1 flex-col items-center justify-center py-1 transition-transform active:scale-95">
+            <span class="flex h-7 w-12 items-center justify-center rounded-full transition-all duration-200 text-white/70 group-hover:text-white">
+                <i class="fas fa-utensils text-sm"></i>
+            </span>
+            <span class="mt-1 font-display text-[11px] leading-tight transition-colors font-medium text-white/70 group-hover:text-white">
+                Kuliner
+            </span>
+        </a>
+
+        
+                <a href="http://localhost/berita"
+           class="group flex flex-1 flex-col items-center justify-center py-1 transition-transform active:scale-95">
+            <span class="flex h-7 w-12 items-center justify-center rounded-full transition-all duration-200 text-white/70 group-hover:text-white">
+                <i class="fas fa-newspaper text-sm"></i>
+            </span>
+            <span class="mt-1 font-display text-[11px] leading-tight transition-colors font-medium text-white/70 group-hover:text-white">
+                Berita
+            </span>
+        </a>
+
+        
+                <button type="button"
+                data-bottom-sheet-toggle
+                aria-expanded="false"
+                aria-controls="mobile-more-sheet"
+                class="group flex flex-1 flex-col items-center justify-center py-1 transition-transform active:scale-95">
+            <span class="relative flex h-7 w-12 items-center justify-center rounded-full transition-all duration-200 text-white/70 group-hover:text-white">
+                <i class="fas fa-grip text-sm"></i>
+                            </span>
+            <span class="mt-1 font-display text-[11px] leading-tight transition-colors font-medium text-white/70 group-hover:text-white">
+                Lainnya
+            </span>
+        </button>
+    </div>
+</nav>
+
+
+
+
+<div id="mobile-more-sheet"
+     data-bottom-sheet
+     hidden
+     class="fixed inset-0 z-50 flex flex-col justify-end lg:hidden"
+     role="dialog"
+     aria-modal="true"
+     aria-label="Menu Layanan Lainnya">
+    
+    <div data-bottom-sheet-backdrop
+         class="fixed inset-0 bg-slate-950/70 transition-opacity"></div>
+
+    
+    <div class="relative z-10 w-full max-h-[85vh] overflow-y-auto rounded-t-3xl border-t border-white/20 bg-navy-900 px-5 pb-8 pt-4 text-white shadow-2xl">
+        
+        <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-white/25"></div>
+
+        
+        <div class="flex items-center justify-between border-b border-white/10 pb-3">
+            <div class="flex items-center gap-2.5">
+                <img src="http://localhost/images/logo.png" alt="Logo" class="h-8 w-auto">
+                <div>
+                    <h3 class="font-display text-sm font-bold text-white">Menu &amp; Layanan</h3>
+                    <p class="text-[11px] text-white/60">Bandung Info Center</p>
+                </div>
+            </div>
+            <button type="button"
+                    data-bottom-sheet-close
+                    aria-label="Tutup menu"
+                    class="grid h-8 w-8 place-items-center rounded-full bg-white/10 text-white/70 transition hover:bg-white/20 hover:text-white">
+                <i class="fas fa-xmark text-sm"></i>
+            </button>
+        </div>
+
+        
+        <div class="mt-4 grid grid-cols-2 gap-2.5">
+            
+            <a href="http://localhost/sejarah"
+               class="flex items-center gap-3 rounded-2xl border p-3 transition active:scale-95 border-white/10 bg-white/5 text-white/80 hover:bg-white/10 hover:text-white">
+                <div class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-amber-500/20 text-amber-400">
+                    <i class="fas fa-landmark text-base"></i>
+                </div>
+                <div class="min-w-0">
+                    <div class="font-display text-xs font-bold text-white">Sejarah</div>
+                    <div class="truncate text-[10px] text-white/60">Arsip &amp; museum</div>
+                </div>
+            </a>
+
+            
+            <a href="http://localhost/galeri"
+               class="flex items-center gap-3 rounded-2xl border p-3 transition active:scale-95 border-white/10 bg-white/5 text-white/80 hover:bg-white/10 hover:text-white">
+                <div class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-sky-500/20 text-sky-400">
+                    <i class="fas fa-images text-base"></i>
+                </div>
+                <div class="min-w-0">
+                    <div class="font-display text-xs font-bold text-white">Galeri</div>
+                    <div class="truncate text-[10px] text-white/60">Pesona kota</div>
+                </div>
+            </a>
+
+            </a>
+
+            
+            <a href="http://localhost/kontak"
+               class="flex items-center gap-3 rounded-2xl border p-3 transition active:scale-95 border-white/10 bg-white/5 text-white/80 hover:bg-white/10 hover:text-white">
+                <div class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-purple-500/20 text-purple-400">
+                    <i class="fas fa-envelope text-base"></i>
+                </div>
+                <div class="min-w-0">
+                    <div class="font-display text-xs font-bold text-white">Kontak</div>
+                    <div class="truncate text-[10px] text-white/60">Bantuan &amp; saran</div>
+                </div>
+            </a>
+        </div>
+
+        
+        <div class="mt-4 rounded-2xl border border-white/10 bg-white/5 p-3.5">
+                            <div class="flex items-center justify-between gap-3">
+                    <div>
+                        <p class="font-display text-xs font-bold text-white">Pengelola Portal?</p>
+                        <p class="text-[10px] text-white/60">Masuk ke panel admin Bandung Info Center</p>
+                    </div>
+                    <a href="http://localhost/login"
+                       class="inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-white px-3.5 py-2 font-display text-xs font-semibold text-navy-900 shadow transition active:scale-95 hover:bg-white/90">
+                        <i class="fas fa-arrow-right-to-bracket text-xs"></i>
+                        <span>Login Admin</span>
+                    </a>
+                </div>
+                    </div>
+    </div>
+</div>
+
+    <main class="flex-1">
+                
+
+
+<section class="relative isolate overflow-hidden bg-navy-900">
+    
+    <img
+        src="http://localhost/images/beranda.png"
+        alt=""
+        loading="lazy"
+        decoding="async"
+        class="w-full object-cover absolute inset-0 -z-20 h-full w-full"
+    >
+
+    
+    <div class="absolute inset-0 -z-10 bg-gradient-to-r from-navy-900/75 via-navy-800/55 to-navy-900/40"></div>
+    <div class="absolute inset-0 -z-10 bg-gradient-to-t from-navy-900/45 via-transparent to-navy-900/30"></div>
+
+    <div class="mx-auto max-w-[1400px] px-5 pb-16 pt-32 sm:px-6 lg:px-8 lg:pb-20 lg:pt-40 flex flex-wrap items-center gap-10">
+        <div class="max-w-2xl w-full">
+                            <nav aria-label="Breadcrumb" class="mb-4 flex flex-wrap items-center gap-2 text-sm text-white/70">
+                                                                        <span class="font-semibold text-white">Beranda</span>
+                                                            </nav>
+            
+                            <h1 class="font-display text-3xl font-extrabold leading-tight text-white sm:text-4xl lg:text-5xl">
+                    Bandung Info Center
+                </h1>
+            
+                            <p class="mt-4 text-base leading-relaxed text-white/85">Portal Layanan Informasi Publik Kota Bandung untuk penyediaan informasi Wisata, Sejarah, kuliner &amp; Berita terkini untuk pengunjung &amp; masyarakat.</p>
+                    </div>
+
+        
+                    <div class="w-full lg:w-auto lg:shrink-0">
+                <div class="rounded-3xl border border-white/25 bg-white/10 backdrop-blur-xl">
+    <div class="flex flex-wrap items-center justify-between gap-5 p-5 sm:p-6">
+        <div class="flex items-center gap-4">
+            <span class="grid shrink-0 place-items-center h-14 w-14 rounded-2xl text-2xl bg-amber-500/25 text-amber-100">
+                <i class="fas fa-cloud"></i>
+            </span>
+
+            <div>
+                <p class="font-display font-extrabold leading-none text-3xl text-white">
+                    29°C
+                </p>
+                <p class="text-white/75 mt-1.5 text-sm">
+                    Cuaca di Kota Bandung &mdash; Berawan
+                </p>
+            </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+            
+            <span class="inline-flex items-center gap-2 rounded-full border px-4 py-2 font-display text-sm font-bold border-amber-300/50 bg-amber-500/25 text-amber-100">
+                <i class="fas fa-sun text-[11px]"></i>
+                Cuaca panas
+            </span>
+
+                    </div>
+    </div>
+
+    
+            <div class="flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-white/15 px-5 py-3 text-xs text-white/75 sm:px-6">
+                            <span class="inline-flex items-center gap-2">
+                    <i class="fas fa-droplet"></i>
+                    60% kelembapan
+                </span>
+            
+                            <span class="inline-flex items-center gap-2">
+                    <i class="fas fa-wind"></i>
+                    7.4 km/jam
+                </span>
+            
+            <span class="inline-flex items-center gap-2">
+                <i class="fas fa-location-dot"></i>
+                Kota Bandung
+            </span>
+        </div>
+    </div>
+            </div>
+            </div>
+</section>
+
+
+<section class="relative z-10 mx-auto -mt-10 max-w-[1400px] px-3 sm:-mt-14 sm:px-6 lg:-mt-16 lg:px-8">
+    
+    <div class="grid grid-cols-2 gap-1.5 rounded-2xl border border-slate-200 bg-white p-2 shadow-[0_12px_36px_rgba(15,23,42,0.08)] sm:auto-fit sm:grid-cols-[repeat(auto-fit,minmax(11rem,1fr))] sm:gap-3 sm:rounded-3xl sm:p-3 lg:gap-4 lg:p-4">
+                    <a href="#wisata"
+               class="group flex flex-col items-center justify-center gap-1.5 rounded-xl border border-transparent py-2 px-1 text-center transition-all duration-200 hover:border-brand-300 hover:bg-brand-50/40 hover:shadow-sm active:scale-95 sm:gap-2.5 sm:rounded-2xl sm:border-slate-200 sm:bg-white sm:px-3 sm:py-3.5 lg:py-4 sm:hover:border-brand-500 sm:hover:shadow-[0_8px_20px_rgba(37,65,160,0.12)]">
+                <span class="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-brand-200 bg-brand-50 text-sm text-brand-600 transition-all duration-200 group-hover:bg-brand-600 group-hover:text-white sm:h-11 sm:w-11 sm:rounded-xl sm:border-2 sm:border-brand-600 sm:text-base sm:text-brand-700">
+                    <i class="fas fa-image"></i>
+                </span>
+
+                <span class="text-center">
+                    <span class="block font-display text-[11px] font-bold text-slate-800 transition-colors group-hover:text-brand-700 sm:text-xs lg:text-sm">Wisata</span>
+                    <span class="mt-0.5 hidden text-[11px] text-slate-400 sm:block">Destinasi unggulan</span>
+                </span>
+            </a>
+                    <a href="#sejarah"
+               class="group flex flex-col items-center justify-center gap-1.5 rounded-xl border border-transparent py-2 px-1 text-center transition-all duration-200 hover:border-brand-300 hover:bg-brand-50/40 hover:shadow-sm active:scale-95 sm:gap-2.5 sm:rounded-2xl sm:border-slate-200 sm:bg-white sm:px-3 sm:py-3.5 lg:py-4 sm:hover:border-brand-500 sm:hover:shadow-[0_8px_20px_rgba(37,65,160,0.12)]">
+                <span class="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-brand-200 bg-brand-50 text-sm text-brand-600 transition-all duration-200 group-hover:bg-brand-600 group-hover:text-white sm:h-11 sm:w-11 sm:rounded-xl sm:border-2 sm:border-brand-600 sm:text-base sm:text-brand-700">
+                    <i class="fas fa-landmark"></i>
+                </span>
+
+                <span class="text-center">
+                    <span class="block font-display text-[11px] font-bold text-slate-800 transition-colors group-hover:text-brand-700 sm:text-xs lg:text-sm">Sejarah</span>
+                    <span class="mt-0.5 hidden text-[11px] text-slate-400 sm:block">Arsip &amp; museum</span>
+                </span>
+            </a>
+                    <a href="#berita"
+               class="group flex flex-col items-center justify-center gap-1.5 rounded-xl border border-transparent py-2 px-1 text-center transition-all duration-200 hover:border-brand-300 hover:bg-brand-50/40 hover:shadow-sm active:scale-95 sm:gap-2.5 sm:rounded-2xl sm:border-slate-200 sm:bg-white sm:px-3 sm:py-3.5 lg:py-4 sm:hover:border-brand-500 sm:hover:shadow-[0_8px_20px_rgba(37,65,160,0.12)]">
+                <span class="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-brand-200 bg-brand-50 text-sm text-brand-600 transition-all duration-200 group-hover:bg-brand-600 group-hover:text-white sm:h-11 sm:w-11 sm:rounded-xl sm:border-2 sm:border-brand-600 sm:text-base sm:text-brand-700">
+                    <i class="fas fa-newspaper"></i>
+                </span>
+
+                <span class="text-center">
+                    <span class="block font-display text-[11px] font-bold text-slate-800 transition-colors group-hover:text-brand-700 sm:text-xs lg:text-sm">Berita</span>
+                    <span class="mt-0.5 hidden text-[11px] text-slate-400 sm:block">Kabar terkini</span>
+                </span>
+            </a>
+                    <a href="#kuliner"
+               class="group flex flex-col items-center justify-center gap-1.5 rounded-xl border border-transparent py-2 px-1 text-center transition-all duration-200 hover:border-brand-300 hover:bg-brand-50/40 hover:shadow-sm active:scale-95 sm:gap-2.5 sm:rounded-2xl sm:border-slate-200 sm:bg-white sm:px-3 sm:py-3.5 lg:py-4 sm:hover:border-brand-500 sm:hover:shadow-[0_8px_20px_rgba(37,65,160,0.12)]">
+                <span class="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-brand-200 bg-brand-50 text-sm text-brand-600 transition-all duration-200 group-hover:bg-brand-600 group-hover:text-white sm:h-11 sm:w-11 sm:rounded-xl sm:border-2 sm:border-brand-600 sm:text-base sm:text-brand-700">
+                    <i class="fas fa-utensils"></i>
+                </span>
+
+                <span class="text-center">
+                    <span class="block font-display text-[11px] font-bold text-slate-800 transition-colors group-hover:text-brand-700 sm:text-xs lg:text-sm">Kuliner</span>
+                    <span class="mt-0.5 hidden text-[11px] text-slate-400 sm:block">Khas Bandung</span>
+                </span>
+            </a>
+            </div>
+</section>
+
+
+<section id="kuliner" class="scroll-mt-20 lg:scroll-mt-24 mx-auto max-w-[1400px] px-5 py-16 lg:px-8">
+    <div class="mb-7 flex flex-wrap items-end justify-between gap-4">
+    <div>
+        <h2 class="font-display text-xl font-extrabold text-slate-900">
+            Rekomendasi Kuliner
+
+                            <span class="font-semibold text-brand-700">(Berdasarkan Suhu Dingin)</span>
+                    </h2>
+
+                    <p class="mt-1 text-sm text-slate-500">
+                Suhu saat ini 29°C, rekomendasi dipilih otomatis.
+            </p>
+            </div>
+
+            <a href="http://localhost/kuliner"
+           class="inline-flex items-center gap-2 rounded-full px-6 py-3 font-display text-sm font-semibold transition bg-brand-600 text-white shadow-[0_6px_18px_rgba(37,65,160,0.32)] hover:bg-brand-700">
+            Lihat Semua
+            <i class="fas fa-arrow-right text-xs"></i>
+        </a>
+    </div>
+
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                    <div class="col-span-full flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-16 text-center sm:col-span-2 lg:col-span-4">
+    <span class="grid h-14 w-14 place-items-center rounded-full bg-slate-100 text-2xl text-slate-400">
+        <i class="fas fa-utensils"></i>
+    </span>
+    <p class="font-display text-lg font-bold text-slate-800">Belum ada rekomendasi kuliner</p>
+
+            <p class="max-w-md text-sm text-slate-500">Kuliner dengan kategori suhu ini belum tersedia.</p>
+    
+    
+</div>
+            </div>
+</section>
+
+
+<section id="berita" class="scroll-mt-20 lg:scroll-mt-24 bg-white py-16">
+    <div class="mx-auto max-w-[1400px] px-5 lg:px-8">
+        <div class="mb-7 flex flex-wrap items-end justify-between gap-4">
+    <div>
+        <h2 class="font-display text-xl font-extrabold text-slate-900">
+            Berita Terbaru
+
+                    </h2>
+
+                    <p class="mt-1 text-sm text-slate-500">
+                Kabar terkini dari Kota Bandung.
+            </p>
+            </div>
+
+            <a href="http://localhost/berita"
+           class="inline-flex items-center gap-2 rounded-full px-6 py-3 font-display text-sm font-semibold transition bg-brand-600 text-white shadow-[0_6px_18px_rgba(37,65,160,0.32)] hover:bg-brand-700">
+            Lihat Semua
+            <i class="fas fa-arrow-right text-xs"></i>
+        </a>
+    </div>
+
+        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                            <div class="col-span-full flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-16 text-center sm:col-span-2 lg:col-span-4">
+    <span class="grid h-14 w-14 place-items-center rounded-full bg-slate-100 text-2xl text-slate-400">
+        <i class="fas fa-newspaper"></i>
+    </span>
+    <p class="font-display text-lg font-bold text-slate-800">Belum ada berita</p>
+
+    
+    
+</div>
+                    </div>
+    </div>
+</section>
+
+
+<section id="wisata" class="scroll-mt-20 lg:scroll-mt-24 mx-auto max-w-[1400px] px-5 py-16 lg:px-8">
+    <div class="mb-7 flex flex-wrap items-end justify-between gap-4">
+    <div>
+        <h2 class="font-display text-xl font-extrabold text-slate-900">
+            Wisata Pilihan
+
+                    </h2>
+
+                    <p class="mt-1 text-sm text-slate-500">
+                Destinasi ikonik dari seluruh penjuru kota.
+            </p>
+            </div>
+
+            <a href="http://localhost/wisata"
+           class="inline-flex items-center gap-2 rounded-full px-6 py-3 font-display text-sm font-semibold transition bg-brand-600 text-white shadow-[0_6px_18px_rgba(37,65,160,0.32)] hover:bg-brand-700">
+            Lihat Semua
+            <i class="fas fa-arrow-right text-xs"></i>
+        </a>
+    </div>
+
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                    <div class="col-span-full flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-16 text-center sm:col-span-2 lg:col-span-4">
+    <span class="grid h-14 w-14 place-items-center rounded-full bg-slate-100 text-2xl text-slate-400">
+        <i class="fas fa-mountain-sun"></i>
+    </span>
+    <p class="font-display text-lg font-bold text-slate-800">Belum ada data wiselyat</p>
+
+    
+    
+</div>
+            </div>
+</section>
+
+
+<section id="sejarah" class="scroll-mt-20 lg:scroll-mt-24 bg-navy-800 py-16">
+    <div class="mx-auto max-w-[1400px] px-5 lg:px-8">
+        <div class="mb-7 flex flex-wrap items-end justify-between gap-4">
+    <div>
+        <h2 class="font-display text-xl font-extrabold text-white">
+            Cerita Sejarah
+
+                    </h2>
+
+                    <p class="mt-1 text-sm text-slate-300">
+                Telusuri tonggak perjalanan Kota Bandung.
+            </p>
+            </div>
+
+            <a href="http://localhost/sejarah"
+           class="inline-flex items-center gap-2 rounded-full px-6 py-3 font-display text-sm font-semibold transition border border-white/30 bg-white/10 text-white backdrop-blur hover:bg-white/20">
+            Lihat Semua
+            <i class="fas fa-arrow-right text-xs"></i>
+        </a>
+    </div>
+
+        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                            <article class="group relative flex h-full flex-col overflow-hidden rounded-2xl border shadow-[0_2px_16px_rgba(15,23,42,0.06)] transition hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(15,23,42,0.12)] cursor-pointer border-slate-200 bg-white ">
+    
+    <img
+        src="http://localhost/images/beranda.png"
+        alt="Bandung Zaman Kerajaan"
+        loading="lazy"
+        decoding="async"
+        class="w-full object-cover aspect-[4/3] transition duration-500 group-hover:scale-105"
+    >
+
+    
+            <a href="http://localhost/sejarah/bandung-zaman-kerajaan" class="absolute inset-0 z-10">
+            <span class="sr-only">Lihat detail Bandung Zaman Kerajaan</span>
+        </a>
+    
+    <div class="flex flex-1 flex-col p-5 bg-brand-600">
+        
+        <div class="mb-2.5 h-6">
+                            <span class="inline-flex max-w-full items-center gap-1.5 truncate rounded-full px-2.5 py-1 text-[11px] font-bold bg-white/20 text-white">
+                    0 bab
+                </span>
+                    </div>
+
+        
+        <h3 class="line-clamp-2 font-display text-base font-bold leading-snug transition text-white">
+            Bandung Zaman Kerajaan
+        </h3>
+
+                    <p class="mt-2 line-clamp-2 text-xs leading-relaxed text-white/75">Ringkasan singkat tentang sejarah Bandung.</p>
+        
+        
+        <div class="mt-auto pt-4">
+            
+            <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-t pt-4 border-white/20">
+                <div class="flex min-w-0 flex-1 flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-white/75">
+                                            
+                        <span class="inline-flex min-w-0 max-w-full basis-full items-start gap-1.5 sm:basis-auto">
+                                                            <i class="fas far fa-calendar mt-[1px] shrink-0 text-[10px]"></i>
+                                                        <span class="min-w-0 break-words hyphens-auto">13 Nov 2026</span>
+                        </span>
+                                    </div>
+
+                
+                            </div>
+        </div>
+    </div>
+</article>
+                    </div>
+    </div>
+</section>
+
+
+<section class="mx-auto max-w-[1400px] px-5 py-16 lg:px-8">
+ <div class="flex flex-wrap items-center justify-between gap-6 rounded-3xl border border-slate-200 bg-white p-8 shadow-[0_2px_16px_rgba(15,23,42,0.06)] lg:p-12">
+ <div class="max-w-xl">
+ <h2 class="font-display text-2xl font-extrabold text-slate-900">Rencanakan liburan hemat</h2>
+ <p class="mt-2 text-sm leading-relaxed text-slate-600">
+ Gunakan paket Smart Budget untuk menghitung perkiraan biaya trip Bandung sebelum berangkat.
+ </p>
+ </div>
+
+ <a href="http://localhost/smart-budget"
+ class="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-navy-800 to-brand-600 px-8 py-4 font-display text-sm font-bold text-white transition duration-200 hover:-translate-y-0.5 hover:from-navy-900 hover:to-brand-700 hover:shadow-xl active:translate-y-0">
+ Buka Smart Budget
+ <i class="fas fa-wallet text-xs"></i>
+ </a>
+ </div>
+</section>
+    </main>
+
+    <footer id="kontak" class="mt-16 hidden scroll-mt-20 bg-slate-900 py-10 text-slate-300 lg:block lg:scroll-mt-24">
+    <div class="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 text-center sm:px-6 md:flex-row md:text-left">
+        <div>
+            <p class="font-display text-lg font-bold text-white">Bandung Info Center</p>
+            <p class="mt-1 text-sm">Sistem Layanan Informasi Publik Kota Bandung.</p>
+        </div>
+
+        <p class="text-sm">&copy; 2026 Seluruh hak cipta dilindungi.</p>
+    </div>
+</footer>    </body>
+</html>

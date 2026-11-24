@@ -58,6 +58,34 @@
                            class="w-full rounded-xl border border-white/20 bg-white/95 px-4 py-3 text-sm text-slate-900 shadow-inner outline-none transition placeholder:text-slate-400 focus:border-accent-500 focus:ring-4 focus:ring-accent-500/30">
                 </div>
 
+                <div>
+                    <label for="captcha" class="mb-1.5 block pl-1 text-xs font-semibold text-white/90">Kode Keamanan</label>
+                    <div class="flex items-center gap-3">
+                        <div id="captcha-image"
+                             class="shrink-0 overflow-hidden rounded-xl border border-white/30 bg-white/95 shadow-inner"
+                             aria-live="polite">
+                            {!! $captchaSvg !!}
+                        </div>
+                        <button type="button"
+                                id="refresh-captcha"
+                                class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-white/25 bg-white/15 text-white transition hover:bg-white/25 focus:outline-none focus:ring-4 focus:ring-accent-500/30"
+                                aria-label="Ganti kode CAPTCHA"
+                                title="Ganti kode">
+                            <i class="fas fa-rotate-right text-sm"></i>
+                        </button>
+                    </div>
+                    <input type="text"
+                           id="captcha"
+                           name="captcha"
+                           required
+                           inputmode="numeric"
+                           pattern="[0-9]{4}"
+                           maxlength="4"
+                           autocomplete="off"
+                           placeholder="Masukkan 4 digit kode"
+                           class="mt-3 w-full rounded-xl border border-white/20 bg-white/95 px-4 py-3 text-sm tracking-[0.3em] text-slate-900 shadow-inner outline-none transition placeholder:tracking-normal placeholder:text-slate-400 focus:border-accent-500 focus:ring-4 focus:ring-accent-500/30">
+                </div>
+
                 <label class="flex cursor-pointer items-center gap-2.5 pl-1 text-xs text-white/80">
                     <input type="checkbox"
                            name="remember"
@@ -85,4 +113,45 @@
             Halaman ini hanya untuk admin. Pengunjung tidak perlu login.
         </p>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const refreshButton = document.getElementById('refresh-captcha');
+            const captchaImage = document.getElementById('captcha-image');
+            const captchaInput = document.getElementById('captcha');
+
+            if (!refreshButton || !captchaImage) return;
+
+            refreshButton.addEventListener('click', async function () {
+                refreshButton.disabled = true;
+                refreshButton.classList.add('opacity-60');
+
+                try {
+                    const response = await fetch(@json(route('login.captcha')), {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json',
+                        },
+                        credentials: 'same-origin',
+                    });
+
+                    if (!response.ok) throw new Error('Gagal memuat CAPTCHA');
+
+                    const data = await response.json();
+                    if (data.svg) {
+                        captchaImage.innerHTML = data.svg;
+                        if (captchaInput) {
+                            captchaInput.value = '';
+                            captchaInput.focus();
+                        }
+                    }
+                } catch (error) {
+                    console.error(error);
+                } finally {
+                    refreshButton.disabled = false;
+                    refreshButton.classList.remove('opacity-60');
+                }
+            });
+        });
+    </script>
 @endsection

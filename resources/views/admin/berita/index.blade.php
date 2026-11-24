@@ -7,7 +7,7 @@
 <x-admin.page-header
     title="Kelola Berita"
     description="Berita beserta audio, jumlah dibaca, dan reaksi pembaca."
-    :action="route('admin.berita.index')"
+    :action="route('admin.berita.create')"
     action-label="Tambah Berita"
 />
 
@@ -16,6 +16,7 @@
         <thead class="bg-slate-50">
             <tr class="text-left text-xs font-bold uppercase tracking-wider text-slate-500">
                 <th class="px-5 py-3.5">No</th>
+                <th class="px-5 py-3.5">Gambar</th>
                 <th class="px-5 py-3.5">Judul</th>
                 <th class="px-5 py-3.5">Kategori</th>
                 <th class="px-5 py-3.5">Tanggal</th>
@@ -30,6 +31,18 @@
         @forelse ($beritas as $index => $row)
             <tr class="transition hover:bg-slate-50">
                 <td class="px-5 py-3.5 text-slate-500">{{ $beritas->firstItem() + $index }}</td>
+                <td class="px-5 py-3.5">
+                    <div class="h-12 w-16 overflow-hidden rounded-lg border border-slate-200">
+                        <x-public.media :src="$row->gambar" :alt="$row->judul" icon="fa-newspaper"
+                            tone="brand" ratio="h-12" />
+                    </div>
+
+                    @if ($row->audio_url)
+                        <p class="mt-1 text-[10px] font-semibold text-violet-600">
+                            <i class="fas fa-volume-high"></i> Audio
+                        </p>
+                    @endif
+                </td>
                 <td class="px-5 py-3.5">
                     <p class="font-display font-semibold text-slate-800">{{ Str::limit($row->judul, 60) }}</p>
                     <p class="text-xs text-slate-400">{{ $row->slug }}</p>
@@ -79,7 +92,7 @@
             </tr>
         @empty
             <tr>
-                <td colspan="7">
+                <td colspan="8">
                     <x-public.empty-state
                         class="border-0"
                         title="Belum ada berita"

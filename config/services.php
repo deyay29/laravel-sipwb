@@ -48,6 +48,46 @@ return [
         'geocoding_url' => 'https://geocoding-api.open-meteo.com/v1/search',
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Kuliner (Fitur Jarak Terdekat)
+    |--------------------------------------------------------------------------
+    |
+    | Titik pusat kota dan radius default untuk fitur "kuliner terdekat".
+    | Radius default dipakai saat pengunjung belum memilih radius sendiri.
+    |
+    */
+
+    'kuliner' => [
+        'pusat_latitude' => env('KULINER_CENTER_LATITUDE', -6.92222),
+
+        'pusat_longitude' => env('KULINER_CENTER_LONGITUDE', 107.60694),
+
+        'default_radius_km' => (int) env('KULINER_DEFAULT_RADIUS_KM', 10),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Teh AI (asisten portal publik)
+    |--------------------------------------------------------------------------
+    |
+    | Konteks chatbot diambil langsung dari tabel publik melalui
+    | TehAiContextService. Gemini dipanggil via HTTP bila kunci tersedia;
+    | tanpa kunci, jawaban tetap disusun dari data database (fallback).
+    |
+    */
+
+    'teh_ai' => [
+        'gemini_key' => env('GEMINI_API_KEY'),
+
+        'gemini_model' => env('GEMINI_MODEL', 'gemini-2.0-flash'),
+
+        'timeout' => (int) env('TEH_AI_TIMEOUT', 12),
+
+        // Maksimal item per kategori yang dimasukkan ke prompt sistem.
+        'context_limit' => (int) env('TEH_AI_CONTEXT_LIMIT', 10),
+    ],
+
     'postmark' => [
         'token' => env('POSTMARK_TOKEN'),
     ],

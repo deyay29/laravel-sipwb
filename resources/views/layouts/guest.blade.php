@@ -21,7 +21,7 @@
     {{-- Foto latar penuh layar --}}
     <div class="pointer-events-none fixed inset-0 bg-cover bg-center"
          style="background-image: url('{{ asset('images/beranda_admin.jpeg') }}')"></div>
-    <div class="pointer-events-none fixed inset-0 bg-gradient-to-br from-navy-900/95 via-navy-800/90 to-navy-900/95"></div>
+    <div class="pointer-events-none fixed inset-0 bg-black/25"></div>
 
     <main class="relative flex min-h-screen items-center justify-center px-4 py-12">
         @yield('content')

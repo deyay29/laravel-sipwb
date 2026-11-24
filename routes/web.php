@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\ContactController;
 use App\Http\Controllers\Admin\GaleriController;
 use App\Http\Controllers\Admin\KulinerController;
 use App\Http\Controllers\Admin\SejarahController;
+use App\Http\Controllers\Admin\SmartBudgetController;
 use App\Http\Controllers\Admin\WisataController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PublicController;
@@ -19,6 +20,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [PublicController::class, 'home'])->name('home');
 Route::get('/kontak', [PublicController::class, 'kontak'])->name('public.kontak');
+
+// Kirim kritik, saran, atau masukan dari halaman Kontak (mode anonim).
+Route::post('/kontak/kirim', [PublicController::class, 'kontakKirim'])->name('public.kontak.kirim');
 
 // Alias lama /profil -> diarahkan ke /kontak.
 Route::get('/profil', fn () => redirect()->route('public.kontak'));
@@ -40,6 +44,7 @@ Route::get('/sejarah/{topik}/bab/{nomorBab}', [PublicController::class, 'sejarah
     ->name('public.sejarah.bab');
 
 Route::get('/galeri', [PublicController::class, 'galeriIndex'])->name('public.galeri');
+Route::get('/galeri/{galeri}', [PublicController::class, 'galeriShow'])->name('public.galeri.show');
 Route::get('/smart-budget', [PublicController::class, 'smartBudgetIndex'])->name('public.smart-budget');
 
 /*
@@ -53,7 +58,8 @@ Route::get('/smart-budget', [PublicController::class, 'smartBudgetIndex'])->name
 */
 
 // Satu-satunya halaman login di aplikasi ini (khusus admin).
-Route::view('/login', 'public.auth.login-admin')->name('login');
+Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+Route::get('/login/captcha', [AuthController::class, 'refreshCaptcha'])->name('login.captcha');
 Route::post('/login', [AuthController::class, 'login'])->name('login.store');
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
@@ -72,9 +78,14 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('berita', BeritaController::class)->except(['show'])->parameters(['berita' => 'berita']);
     Route::resource('sejarah', SejarahController::class)->except(['show'])->parameters(['sejarah' => 'sejarah']);
     Route::resource('galeri', GaleriController::class)->except(['show'])->parameters(['galeri' => 'galeri']);
+    Route::resource('smart-budget', SmartBudgetController::class)->except(['show'])->parameters(['smart_budget' => 'smartBudget']);
 
     // Profil kontak: satu baris singleton, jadi hanya index + edit + update.
     Route::get('contact', [ContactController::class, 'index'])->name('contact.index');
     Route::get('contact/{contact}/edit', [ContactController::class, 'edit'])->name('contact.edit');
     Route::put('contact/{contact}', [ContactController::class, 'update'])->name('contact.update');
+
+    // Daftar kritik, saran, atau masukan pengunjung dari halaman publik.
+    Route::get('contact/messages', [ContactController::class, 'indexMessages'])->name('contact.messages.index');
+    Route::delete('contact/messages/{contactMessage}', [ContactController::class, 'destroyMessage'])->name('contact.messages.destroy');
 });

@@ -7,7 +7,7 @@
 <x-admin.page-header
     title="Kelola Galeri"
     description="Kumpulan foto yang ditampilkan di repository visual publik."
-    :action="route('admin.galeri.index')"
+    :action="route('admin.galeri.create')"
     action-label="Tambah Foto"
 />
 

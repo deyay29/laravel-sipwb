@@ -91,6 +91,18 @@ return [
             'pattern' => 'admin.galeri.*',
             'icon' => 'fa-images',
         ],
+        [
+            'label' => 'Smart Budget',
+            'route' => 'admin.smart-budget.index',
+            'pattern' => 'admin.smart-budget.*',
+            'icon' => 'fa-calculator',
+        ],
+        [
+            'label' => 'Kritik & Masukan',
+            'route' => 'admin.contact.messages.index',
+            'pattern' => 'admin.contact.messages.*',
+            'icon' => 'fa-comment-sms',
+        ],
     ],
 
     /*

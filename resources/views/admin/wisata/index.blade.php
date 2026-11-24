@@ -7,7 +7,7 @@
 <x-admin.page-header
     title="Kelola Wisata"
     description="Daftar tempat wisata yang tampil di halaman publik."
-    :action="route('admin.wisata.index')"
+    :action="route('admin.wisata.create')"
     action-label="Tambah Wisata"
 />
 
@@ -16,8 +16,10 @@
         <thead class="bg-slate-50">
             <tr class="text-left text-xs font-bold uppercase tracking-wider text-slate-500">
                 <th class="px-5 py-3.5">No</th>
+                <th class="px-5 py-3.5">Foto</th>
                 <th class="px-5 py-3.5">Nama Wisata</th>
                 <th class="px-5 py-3.5">Kategori</th>
+                <th class="px-5 py-3.5">Anggaran</th>
                 <th class="px-5 py-3.5">Lokasi</th>
                 <th class="px-5 py-3.5">Harga Tiket</th>
                 <th class="px-5 py-3.5">Aksi</th>
@@ -30,10 +32,31 @@
             <tr class="transition hover:bg-slate-50">
                 <td class="px-5 py-3.5 text-slate-500">{{ $wisatas->firstItem() + $index }}</td>
                 <td class="px-5 py-3.5">
+                    <div class="h-12 w-16 overflow-hidden rounded-lg border border-slate-200">
+                        <x-public.media :src="$row->gambar" :alt="$row->nama_wisata" icon="fa-mountain-sun"
+                            tone="emerald" ratio="h-12" />
+                    </div>
+                    @if ($row->fotos_count > 1)
+                        <p class="mt-1 text-[10px] font-semibold text-slate-400">
+                            <i class="fas fa-images"></i> {{ $row->fotos_count }} foto
+                        </p>
+                    @endif
+                </td>
+                <td class="px-5 py-3.5">
                     <p class="font-display font-semibold text-slate-800">{{ $row->nama_wisata }}</p>
                     <p class="text-xs text-slate-400">{{ $row->slug }}</p>
                 </td>
                 <td class="px-5 py-3.5 text-slate-600">{{ $row->kategori ?? '-' }}</td>
+                <td class="px-5 py-3.5">
+                    <span @class([
+                        'inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide',
+                        'bg-emerald-50 text-emerald-700' => $row->kategori_budget === \App\Models\Wisata::BUDGET_HEMAT,
+                        'bg-sky-50 text-sky-700' => $row->kategori_budget === \App\Models\Wisata::BUDGET_SEDANG,
+                        'bg-violet-50 text-violet-700' => $row->kategori_budget === \App\Models\Wisata::BUDGET_NYAMAN,
+                    ])>
+                        {{ $row->labelKategoriBudget() }}
+                    </span>
+                </td>
                 <td class="px-5 py-3.5 text-slate-600">{{ $row->lokasi ?? '-' }}</td>
                 <td class="px-5 py-3.5 text-slate-600">{{ $row->harga_tiket ? 'Rp'.number_format($row->harga_tiket, 0, ',', '.') : 'Gratis' }}</td>
                 <td>
@@ -56,7 +79,7 @@
             </tr>
         @empty
             <tr>
-                <td colspan="6">
+                <td colspan="8">
                     <x-public.empty-state
                         class="border-0"
                         title="Belum ada data wisata"

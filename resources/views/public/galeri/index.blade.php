@@ -11,6 +11,10 @@
 />
 
 <section class="mx-auto max-w-[1400px] px-4 py-14 sm:px-6">
+    <div class="mb-6 flex justify-end">
+        <x-public.share-buttons :title="'Galeri Foto Kota Bandung'" label="Bagikan halaman" />
+    </div>
+
     @php
         $kategoris = App\Models\Galeri::query()
             ->whereNotNull('kategori_objek')
@@ -61,7 +65,9 @@
         {{-- Masonry: tinggi tiap foto bebas, mengisi kolom sedekat mungkin --}}
         <div class="columns-1 gap-6 sm:columns-2 lg:columns-3">
             @foreach ($galeris as $galeri)
-                <figure class="group mb-6 break-inside-avoid overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_2px_16px_rgba(15,23,42,0.06)] transition hover:shadow-[0_12px_32px_rgba(15,23,42,0.10)]">
+                <a href="{{ route('public.galeri.show', $galeri) }}"
+                   aria-label="Lihat detail foto {{ $galeri->judul }}"
+                   class="group mb-6 block break-inside-avoid overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_2px_16px_rgba(15,23,42,0.06)] transition hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-[0_12px_32px_rgba(15,23,42,0.10)]">
                     <x-public.media
                         :src="$galeri->file_gambar"
                         :alt="$galeri->judul"
@@ -71,9 +77,9 @@
                         class="transition duration-500 group-hover:scale-105"
                     />
 
-                    <figcaption class="p-5">
+                    <div class="p-5">
                         <div class="flex items-start justify-between gap-3">
-                            <h2 class="font-display text-base font-bold text-slate-900">
+                            <h2 class="font-display text-base font-bold text-slate-900 transition group-hover:text-brand-700">
                                 {{ Str::limit($galeri->judul, 50) }}
                             </h2>
 
@@ -89,8 +95,13 @@
                                 {{ Str::limit($galeri->keterangan, 110) }}
                             </p>
                         @endif
-                    </figcaption>
-                </figure>
+
+                        <span class="mt-4 inline-flex items-center gap-1.5 font-display text-xs font-bold text-brand-700">
+                            Lihat Foto
+                            <i class="fas fa-arrow-right text-[10px] transition group-hover:translate-x-1"></i>
+                        </span>
+                    </div>
+                </a>
             @endforeach
         </div>
 

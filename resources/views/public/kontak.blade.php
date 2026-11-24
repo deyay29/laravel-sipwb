@@ -10,8 +10,8 @@
     :breadcrumb="['Beranda' => route('home'), 'Kontak' => null]"
 />
 
-<section class="mx-auto max-w-5xl px-4 py-14 sm:px-6">
-    <div class="grid gap-8 lg:grid-cols-5">
+<section class="mx-auto max-w-[1400px] px-4 py-14 sm:px-6">
+    <div class="grid gap-8 lg:grid-cols-5 max-w-[1400px]">
         {{-- Informasi kontak --}}
         <div class="space-y-5 lg:col-span-2">
             <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_2px_16px_rgba(15,23,42,0.06)]">
@@ -94,10 +94,17 @@
         {{-- Peta --}}
         <div class="lg:col-span-3">
             <div class="h-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_2px_16px_rgba(15,23,42,0.06)]">
-                @if ($contact->map_embed)
-                    <div class="h-full min-h-[380px] [&>iframe]:h-full [&>iframe]:w-full [&>iframe]:border-0">
-                        {!! $contact->map_embed !!}
-                    </div>
+                @php
+                    // Nilai peta dari admin bisa berupa kode <iframe> maupun URL
+                    // biasa. Keduanya dinormalisasi jadi iframe yang aman
+                    // (whitelist domain Google Maps), supaya URL mentah tidak
+                    // tampil sebagai teks dan tidak ada markup berbahaya yang
+                    // ikut ter-render.
+                    $petaIframe = \App\Support\MapEmbed::toSafeIframe($contact->map_embed);
+                @endphp
+
+                @if ($petaIframe)
+                    <div class="h-full min-h-[380px]">{!! $petaIframe !!}</div>
                 @else
                     <div class="flex h-full min-h-[380px] flex-col items-center justify-center gap-3 px-6 text-center">
                         <span class="grid h-14 w-14 place-items-center rounded-full bg-slate-100 text-2xl text-slate-400">
@@ -110,6 +117,63 @@
                     </div>
                 @endif
             </div>
+        </div>
+    </div>
+
+    {{-- Form kirim kritik, saran, atau masukan (mode anonim) --}}
+    <div class="mt-8">
+        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_2px_16px_rgba(15,23,42,0.06)] sm:p-8">
+            <h2 class="font-display text-lg font-extrabold text-slate-900">Kirim Kritik, Saran &amp; Masukan</h2>
+            <p class="mt-2 max-w-2xl text-sm leading-relaxed text-slate-500">
+                Tulis kritik, saran, atau masukan Anda tentang layanan ini.
+                Pengiriman dilakukan secara <strong>anonim</strong>, tanpa perlu mengisi nama atau email.
+            </p>
+
+            <form action="{{ route('public.kontak.kirim') }}" method="POST" class="mt-6 space-y-5">
+                @csrf
+
+                <div>
+                    <label for="kategori" class="mb-1.5 block font-display text-sm font-semibold text-slate-700">
+                        Kategori <span class="text-rose-500">*</span>
+                    </label>
+                    <select id="kategori"
+                            name="kategori"
+                            required
+                            class="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20">
+                        <option value="">-- Pilih kategori --</option>
+                        <option value="kritik">Kritik</option>
+                        <option value="saran">Saran</option>
+                        <option value="masukan">Masukan</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="pesan" class="mb-1.5 block font-display text-sm font-semibold text-slate-700">
+                        Pesan <span class="text-rose-500">*</span>
+                    </label>
+                    <textarea id="pesan"
+                              name="pesan"
+                              rows="5"
+                              maxlength="5000"
+                              required
+                              placeholder="Ceritakan kritik, saran, atau masukan Anda..."
+                              class="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm leading-relaxed outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"></textarea>
+                    <p class="mt-1.5 text-xs text-slate-400">
+                        Kirim sebagai anonim: nama dan email tidak wajib diisi dan tidak akan diajukan kepada pengirim.
+                    </p>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-4">
+                    <button type="submit"
+                            class="inline-flex items-center gap-2 rounded-[10px] bg-gradient-to-br from-navy-800 to-brand-600 px-6 py-2.5 font-display text-sm font-semibold text-white transition hover:shadow-[0_8px_24px_rgba(26,42,108,0.35)]">
+                        <i class="fas fa-paper-plane text-xs"></i>
+                        Kirim Masukan
+                    </button>
+                    <p class="text-xs text-slate-400">
+                        Kritik, saran, atau masukan Anda akan langsung tersimpan tanpa proses balasan admin.
+                    </p>
+                </div>
+            </form>
         </div>
     </div>
 </section>

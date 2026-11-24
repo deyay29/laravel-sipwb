@@ -17,7 +17,7 @@ class BeritaSeeder extends Seeder
         $beritas = [
             [
                 'judul' => 'Konferensi Asia Afrika 1955 Mengenalkan Bandung ke Dunia',
-                'kategori' => 'Sejarah',
+                'kategori' => 'Berita',
                 'isi' => 'Konferensi Asia Afrika berlangsung pada 18-24 April 1955 di Gedung Merdeka, Bandung. Konferensi ini diikuti 29 negara dari Asia dan Afrika, dan menghasilkan Dasasila Bandung.',
                 'gambar' => 'images/beranda.png',
                 'audio_url' => null,

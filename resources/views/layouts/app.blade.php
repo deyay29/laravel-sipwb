@@ -23,5 +23,8 @@
 
     @include('layouts.partials.footer')
     @stack('scripts')
+
+    {{-- Satu-satunya widget Teh AI: chat lokal yang memanggil /api/teh-ai/chat --}}
+    @include('layouts.partials.teh-ai-chat')
 </body>
 </html>

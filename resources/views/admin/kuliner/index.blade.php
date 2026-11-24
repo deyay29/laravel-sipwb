@@ -7,7 +7,7 @@
 <x-admin.page-header
     title="Kelola Kuliner"
     description="Kuliner dengan kategori suhu dan status tayang."
-    :action="route('admin.kuliner.index')"
+    :action="route('admin.kuliner.create')"
     action-label="Tambah Kuliner"
 />
 
@@ -16,9 +16,12 @@
         <thead class="bg-slate-50">
             <tr class="text-left text-xs font-bold uppercase tracking-wider text-slate-500">
                 <th class="px-5 py-3.5">No</th>
+                <th class="px-5 py-3.5">Foto</th>
                 <th class="px-5 py-3.5">Nama Kuliner</th>
                 <th class="px-5 py-3.5">Kategori Suhu</th>
                 <th class="px-5 py-3.5">Harga</th>
+                <th class="px-5 py-3.5">Lokasi</th>
+                <th class="px-5 py-3.5">Family &amp; Kids</th>
                 <th class="px-5 py-3.5">Status</th>
                 <th class="px-5 py-3.5">Aksi</th>
             </tr>
@@ -30,6 +33,17 @@
             <tr class="transition hover:bg-slate-50">
                 <td class="px-5 py-3.5 text-slate-500">{{ $kuliners->firstItem() + $index }}</td>
                 <td class="px-5 py-3.5">
+                    <div class="h-12 w-16 overflow-hidden rounded-lg border border-slate-200">
+                        <x-public.media :src="$row->foto" :alt="$row->nama_kuliner" icon="fa-utensils"
+                            tone="amber" ratio="h-12" />
+                    </div>
+                    @if ($row->fotos_count > 1)
+                        <p class="mt-1 text-[10px] font-semibold text-slate-400">
+                            <i class="fas fa-images"></i> {{ $row->fotos_count }} foto
+                        </p>
+                    @endif
+                </td>
+                <td class="px-5 py-3.5">
                     <p class="font-display font-semibold text-slate-800">{{ $row->nama_kuliner }}</p>
                     <p class="text-xs text-slate-400">{{ $row->slug }}</p>
                 </td>
@@ -39,15 +53,33 @@
                             'inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold',
                             'bg-rose-100 text-rose-700' => $row->kategori_suhu === \App\Models\Kuliner::SUHU_MENGHANGATKAN,
                             'bg-sky-100 text-sky-700' => $row->kategori_suhu === \App\Models\Kuliner::SUHU_MENYEGARKAN,
+                            'bg-slate-100 text-slate-600' => $row->kategori_suhu === \App\Models\Kuliner::SUHU_SEGALA_SUASANA,
                         ])>
-                            <i class="fas {{ $row->kategori_suhu === \App\Models\Kuliner::SUHU_MENGHANGATKAN ? 'fa-fire' : 'fa-snowflake' }} text-[10px]"></i>
+                            <i class="fas {{ $row->kategori_suhu === \App\Models\Kuliner::SUHU_MENGHANGATKAN ? 'fa-fire' : ($row->kategori_suhu === \App\Models\Kuliner::SUHU_MENYEGARKAN ? 'fa-snowflake' : 'fa-compass') }} text-[10px]"></i>
                             {{ $row->kategori_suhu }}
                         </span>
                     @else
                         <span class="text-slate-400">-</span>
                     @endif
                 </td>
-                <td class="px-5 py-3.5 text-slate-600">{{ $row->harga ? 'Rp'.number_format($row->harga, 0, ',', '.') : '-' }}</td>
+                <td class="px-5 py-3.5 text-slate-600">{{ $row->hargaTampilan() ?? '-' }}</td>
+                <td class="px-5 py-3.5">
+                    @if ($row->hasKoordinat())
+                        <p class="font-semibold text-slate-700">{{ (float) $row->latitude }}, {{ (float) $row->longitude }}</p>
+                        <p class="text-xs text-slate-400">Radius sekitar {{ $row->radius_kilometer ? (float) $row->radius_kilometer : '-' }} km</p>
+                    @else
+                        <span class="text-slate-400">-</span>
+                    @endif
+                </td>
+                <td class="px-5 py-3.5">
+                    @if ($row->ramah_anak)
+                        <span class="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700">
+                            <i class="fas fa-users text-[10px]"></i> Family &amp; Kids
+                        </span>
+                    @else
+                        <span class="text-slate-400">-</span>
+                    @endif
+                </td>
                 <td class="px-5 py-3.5">
                     <span @class([
                         'inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold',
@@ -78,7 +110,7 @@
             </tr>
         @empty
             <tr>
-                <td colspan="6">
+                <td colspan="9">
                     <x-public.empty-state
                         class="border-0"
                         title="Belum ada data kuliner"
