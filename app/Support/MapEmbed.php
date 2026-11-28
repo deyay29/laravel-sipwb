@@ -47,7 +47,7 @@ final class MapEmbed
      */
     public static function toSafeIframe(?string $value): ?string
     {
-        $url = static::resolveSourceUrl($value);
+        $url = self::resolveSourceUrl($value);
 
         if ($url === null) {
             return null;
@@ -80,13 +80,13 @@ final class MapEmbed
 
             $src = html_entity_decode(trim($m[2]), ENT_QUOTES);
 
-            return static::isAllowedHost($src) ? $src : null;
+            return self::isAllowedHost($src) ? $src : null;
         }
 
         // Bentuk 2: URL biasa / koordinat / alamat teks.
-        $url = static::toEmbedUrl($value);
+        $url = self::toEmbedUrl($value);
 
-        return static::isAllowedHost($url) ? $url : null;
+        return self::isAllowedHost($url) ? $url : null;
     }
 
     /**
@@ -107,6 +107,7 @@ final class MapEmbed
 
         return in_array(strtolower($host), self::ALLOWED_HOSTS, true);
     }
+
     /**
      * Ubah link Google Maps apa pun menjadi URL yang bisa di-embed lewat
      * iframe, atau null kalau tidak bisa dibaca.

@@ -10,19 +10,12 @@
         $isSegalaSuasana = $kuliner->kategori_suhu === \App\Models\Kuliner::SUHU_SEGALA_SUASANA;
 
         /*
-         * Foto untuk slider: semua foto kuliner (sampul + album yang diunggah
-         * lewat admin), lalu dilengkapi foto galeri kategori "Kuliner".
-         * Kalau hanya ada satu, komponen merender gambar tunggal tanpa panah.
+         * Foto untuk slider: hanya foto milik kuliner ini sendiri (sampul +
+         * album yang diunggah lewat admin). Kalau hanya ada satu, komponen
+         * merender gambar tunggal tanpa panah.
          */
         $fotoSlider = collect($kuliner->semuaFoto())
             ->map(fn ($src) => ['src' => $src, 'alt' => $kuliner->nama_kuliner])
-            ->merge(
-                App\Models\Galeri::query()
-                    ->where('kategori_objek', 'like', '%Kuliner%')
-                    ->get()
-                    ->map(fn($g) => ['src' => $g->file_gambar, 'alt' => $g->judul]),
-            )
-            ->unique('src')
             ->values()
             ->all();
 
@@ -195,6 +188,7 @@
         {{-- Kuliner terkait --}}
         @php
             $terkait = \App\Models\Kuliner::aktif()
+                ->with('fotos')
                 ->where('id_kuliner', '!=', $kuliner->id_kuliner)
                 ->inRandomOrder()
                 ->take(3)
@@ -209,7 +203,7 @@
                     @foreach ($terkait as $item)
                         <a href="{{ route('public.kuliner.show', $item) }}"
                             class="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_2px_16px_rgba(15,23,42,0.06)] transition hover:shadow-[0_12px_32px_rgba(15,23,42,0.12)]">
-                            <x-public.media :src="$item->foto" :alt="$item->nama_kuliner" icon="fa-utensils" tone="amber"
+                            <x-public.media :src="$item->fotoUtama()" :alt="$item->nama_kuliner" icon="fa-utensils" tone="amber"
                                 ratio="h-48" class="transition duration-500 group-hover:scale-105" />
 
                             <div class="bg-brand-600 p-5 text-white">

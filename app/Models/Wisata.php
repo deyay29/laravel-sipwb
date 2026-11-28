@@ -117,11 +117,22 @@ class Wisata extends Model
             ? $this->fotos->pluck('path')->all()
             : $this->fotos()->pluck('path')->all();
 
-        if ($this->gambar && ! in_array($this->gambar, $paths, true)) {
+        if ($this->gambar) {
             array_unshift($paths, $this->gambar);
         }
 
-        return array_values(array_filter($paths));
+        return array_values(array_unique(array_filter($paths)));
+    }
+
+    /**
+     * Foto sampul utama untuk kartu publik (beranda, daftar, terkait).
+     *
+     * Selalu mengambil elemen pertama dari semuaFoto() supaya foto kartu di
+     * halaman publik pasti sama dengan foto pertama di halaman show detail.
+     */
+    public function fotoUtama(): ?string
+    {
+        return $this->semuaFoto()[0] ?? null;
     }
 
     public function getRouteKeyName(): string

@@ -158,7 +158,7 @@
                 <article class="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_2px_16px_rgba(15,23,42,0.06)] transition hover:shadow-[0_12px_32px_rgba(15,23,42,0.10)]">
                     <a href="{{ route('public.wisata.show', $wisata) }}" class="relative block overflow-hidden">
                         <x-public.media
-                            :src="$wisata->gambar"
+                            :src="$wisata->fotoUtama()"
                             alt="{{ $wisata->nama_wisata }}"
                             icon="fa-mountain-sun"
                             tone="emerald"

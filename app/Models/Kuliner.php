@@ -126,11 +126,22 @@ class Kuliner extends Model
             ? $this->fotos->pluck('path')->all()
             : $this->fotos()->pluck('path')->all();
 
-        if ($this->foto && ! in_array($this->foto, $paths, true)) {
+        if ($this->foto) {
             array_unshift($paths, $this->foto);
         }
 
-        return array_values(array_filter($paths));
+        return array_values(array_unique(array_filter($paths)));
+    }
+
+    /**
+     * Foto sampul utama untuk kartu publik (beranda, daftar, terkait).
+     *
+     * Selalu mengambil elemen pertama dari semuaFoto() supaya foto kartu di
+     * halaman publik pasti sama dengan foto pertama di halaman show detail.
+     */
+    public function fotoUtama(): ?string
+    {
+        return $this->semuaFoto()[0] ?? null;
     }
 
     /**

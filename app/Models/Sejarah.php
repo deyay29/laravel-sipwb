@@ -52,6 +52,30 @@ class Sejarah extends Model
             ->orderBy('nomor_bab');
     }
 
+    /**
+     * Foto sampul utama topik sejarah untuk beranda, daftar, dan detail.
+     *
+     * Prioritas: gambar_utama -> gambar bab pertama yang tersedia -> gambar_flipbook.
+     * Dengan satu sumber yang sama, foto di kartu publik selalu konsisten
+     * dengan foto utama pada halaman show detail.
+     */
+    public function fotoUtama(): ?string
+    {
+        if ($this->gambar_utama) {
+            return $this->gambar_utama;
+        }
+
+        $gambarBab = $this->relationLoaded('babs')
+            ? $this->babs->first(fn (SejarahBab $bab) => ! empty($bab->gambar))?->gambar
+            : $this->babs()->whereNotNull('gambar')->where('gambar', '!=', '')->value('gambar');
+
+        if ($gambarBab) {
+            return $gambarBab;
+        }
+
+        return $this->gambar_flipbook ?: null;
+    }
+
     public function getRouteKeyName(): string
     {
         return 'slug';

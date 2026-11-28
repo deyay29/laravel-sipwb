@@ -6,19 +6,12 @@
 @section('content')
 @php
     /*
-     * Foto untuk slider: semua foto wisata (sampul + album upload admin),
-     * lalu dilengkapi foto galeri kategori "Wisata". Kalau hanya ada satu,
-     * komponen merender gambar tunggal tanpa tombol panah.
+     * Foto untuk slider: hanya foto milik wisata ini sendiri (sampul + album
+     * upload admin). Kalau hanya ada satu, komponen merender gambar tunggal
+     * tanpa tombol panah.
      */
     $fotoSlider = collect($wisata->semuaFoto())
         ->map(fn ($src) => ['src' => $src, 'alt' => $wisata->nama_wisata])
-        ->merge(
-            App\Models\Galeri::query()
-                ->where('kategori_objek', 'like', '%Wisata%')
-                ->get()
-                ->map(fn ($g) => ['src' => $g->file_gambar, 'alt' => $g->judul])
-        )
-        ->unique('src')
         ->values()
         ->all();
 
@@ -234,7 +227,8 @@
 
  {{-- Wisata terkait --}}
  @php
- $terkait = \App\Models\Wisata::where('id_wisata', '!=', $wisata->id_wisata)
+ $terkait = \App\Models\Wisata::with('fotos')
+ ->where('id_wisata', '!=', $wisata->id_wisata)
  ->inRandomOrder()
  ->take(3)
  ->get();
@@ -249,7 +243,7 @@
  <a href="{{ route('public.wisata.show', $item) }}"
  class="group overflow-hidden rounded-2xl bg-brand-600 text-white shadow-[0_4px_18px_rgba(37,65,160,0.25)] transition">
  <x-public.media
- :src="$item->gambar"
+ :src="$item->fotoUtama()"
  :alt="$item->nama_wisata"
  icon="fa-mountain-sun"
  tone="emerald"

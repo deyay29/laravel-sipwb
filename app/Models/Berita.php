@@ -69,6 +69,14 @@ class Berita extends Model
         return $this->hasOne(ReaksiBerita::class, 'id_berita', 'id_berita');
     }
 
+    /**
+     * Foto utama berita agar seluruh halaman publik memakai resolver yang sama.
+     */
+    public function fotoUtama(): ?string
+    {
+        return $this->gambar ?: null;
+    }
+
     public function getRouteKeyName(): string
     {
         return 'slug';

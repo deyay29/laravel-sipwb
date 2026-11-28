@@ -206,11 +206,18 @@
 
                 <article
                     class="group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_2px_16px_rgba(15,23,42,0.06)] transition hover:shadow-[0_12px_32px_rgba(15,23,42,0.12)]">
-                    <a href="{{ route('public.kuliner.show', $kuliner) }}" class="relative block overflow-hidden aspect-[4/3] bg-slate-100">
-                        {{-- Menggunakan path eksplisit ke folder kuliner agar gambar ter-load dengan sempurna --}}
-                        <img src="{{ $kuliner->foto ? asset('storage/kuliner/' . basename($kuliner->foto)) : 'https://placehold.co/600x400?text=No+Image' }}" 
-                             alt="{{ $kuliner->nama_kuliner }}" 
-                             class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
+                    @php
+                        $jumlahFoto = count($kuliner->semuaFoto());
+                    @endphp
+                    <a href="{{ route('public.kuliner.show', $kuliner) }}" class="relative block overflow-hidden">
+                        <x-public.media
+                            :src="$kuliner->fotoUtama()"
+                            :alt="$kuliner->nama_kuliner"
+                            icon="fa-utensils"
+                            tone="amber"
+                            ratio="aspect-[4/3]"
+                            class="transition duration-500 group-hover:scale-105"
+                        />
 
                         @if ($kuliner->ramah_anak)
                             <span
@@ -232,11 +239,11 @@
                             </span>
                         @endif
 
-                        @if ($kuliner->fotos_count > 0)
+                        @if ($jumlahFoto > 0)
                             <span
                                 class="absolute bottom-3 right-3 inline-flex items-center gap-1.5 rounded-full bg-navy-900/75 px-2.5 py-1 text-[11px] font-bold text-white backdrop-blur">
                                 <i class="fas fa-images text-[10px]"></i>
-                                {{ $kuliner->fotos_count }} foto
+                                {{ $jumlahFoto }} foto
                             </span>
                         @endif
                     </a>

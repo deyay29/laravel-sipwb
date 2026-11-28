@@ -82,7 +82,7 @@
             <x-public.content-card
                 variant="brand"
                 :href="route('public.kuliner.show', $kuliner)"
-                :src="$kuliner->foto"
+                :src="$kuliner->fotoUtama()"
                 :image-alt="$kuliner->nama_kuliner"
                 image-icon="fa-utensils"
                 image-tone="amber"
@@ -119,7 +119,7 @@
                 <x-public.content-card
                     variant="brand"
                     :href="route('public.berita.show', $berita)"
-                    :src="$berita->gambar"
+                    :src="$berita->fotoUtama()"
                     :image-alt="$berita->judul"
                     image-icon="fa-newspaper"
                     image-tone="brand"
@@ -156,7 +156,7 @@
             <x-public.content-card
                 variant="brand"
                 :href="route('public.wisata.show', $wisata)"
-                :src="$wisata->gambar"
+                :src="$wisata->fotoUtama()"
                 :image-alt="$wisata->nama_wisata"
                 image-icon="fa-mountain-sun"
                 image-tone="emerald"
@@ -193,7 +193,7 @@
                 <x-public.content-card
                     variant="brand"
                     :href="route('public.sejarah.show', $topik)"
-                    :src="$topik->gambar_utama"
+                    :src="$topik->fotoUtama()"
                     :image-alt="$topik->judul_topik"
                     image-icon="fa-landmark"
                     image-tone="violet"

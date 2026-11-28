@@ -86,4 +86,12 @@
             </div>
         @endunless
     </div>
+@else
+    <x-public.media
+        :src="null"
+        :icon="$icon"
+        :tone="$tone"
+        :ratio="$ratio"
+        :class="'rounded-2xl '.$class"
+    />
 @endif

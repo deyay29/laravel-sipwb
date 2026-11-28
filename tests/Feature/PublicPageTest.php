@@ -383,4 +383,104 @@ class PublicPageTest extends TestCase
         $this->assertSame(1, $berita->fresh()->visitor_count);
         $this->assertDatabaseHas('reaksi_berita', ['id_berita' => $berita->id_berita]);
     }
+
+    public function test_foto_kuliner_di_publik_konsisten_dengan_show_detail_dan_tidak_campur_galeri(): void
+    {
+        $kuliner = Kuliner::factory()->create([
+            'nama_kuliner' => 'Kopi Djawa Spesial',
+            'foto' => null,
+        ]);
+
+        $kuliner->fotos()->create([
+            'path' => 'images/kopi_djawa.jpg',
+            'urutan' => 1,
+        ]);
+
+        // Foto galeri kategori Kuliner milik item lain tidak boleh masuk ke detail kuliner ini.
+        Galeri::factory()->create([
+            'judul' => 'Foto Galeri Lain',
+            'kategori_objek' => 'Kuliner',
+            'file_gambar' => 'images/batagor_kingslay.jpg',
+        ]);
+
+        $this->assertSame('images/kopi_djawa.jpg', $kuliner->fresh()->fotoUtama());
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('images/kopi_djawa.jpg', false);
+
+        $this->get('/kuliner')
+            ->assertOk()
+            ->assertSee('images/kopi_djawa.jpg', false)
+            ->assertDontSee('storage/kuliner/kopi_djawa.jpg', false);
+
+        $this->get("/kuliner/{$kuliner->slug}")
+            ->assertOk()
+            ->assertSee('images/kopi_djawa.jpg', false)
+            ->assertDontSee('images/batagor_kingslay.jpg', false);
+    }
+
+    public function test_foto_wisata_di_publik_konsisten_dengan_show_detail_dan_tidak_campur_galeri(): void
+    {
+        $wisata = Wisata::factory()->create([
+            'nama_wisata' => 'Gedung Sate',
+            'gambar' => null,
+        ]);
+
+        $wisata->fotos()->create([
+            'path' => 'images/beranda.png',
+            'urutan' => 1,
+        ]);
+
+        Galeri::factory()->create([
+            'judul' => 'Foto Wisata Lain',
+            'kategori_objek' => 'Wisata',
+            'file_gambar' => 'images/batagor_kingslay.jpg',
+        ]);
+
+        $this->assertSame('images/beranda.png', $wisata->fresh()->fotoUtama());
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('images/beranda.png', false);
+
+        $this->get('/wisata')
+            ->assertOk()
+            ->assertSee('images/beranda.png', false);
+
+        $this->get("/wisata/{$wisata->slug}")
+            ->assertOk()
+            ->assertSee('images/beranda.png', false)
+            ->assertDontSee('images/batagor_kingslay.jpg', false);
+    }
+
+    public function test_foto_sejarah_fallback_ke_gambar_bab_konsisten_di_semua_halaman(): void
+    {
+        $topik = Sejarah::factory()->create([
+            'judul_topik' => 'Sejarah Tanpa Sampul Utama',
+            'gambar_utama' => null,
+            'gambar_flipbook' => null,
+        ]);
+
+        $topik->babs()->create([
+            'nomor_bab' => 1,
+            'judul_bab' => 'Bab Pembuka',
+            'isi_bab' => 'Isi bab pembuka.',
+            'gambar' => 'images/kopi_djawa.jpg',
+        ]);
+
+        $this->assertSame('images/kopi_djawa.jpg', $topik->fresh()->fotoUtama());
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('images/kopi_djawa.jpg', false);
+
+        $this->get('/sejarah')
+            ->assertOk()
+            ->assertSee('images/kopi_djawa.jpg', false);
+
+        $this->get("/sejarah/{$topik->slug}")
+            ->assertOk()
+            ->assertSee('images/kopi_djawa.jpg', false);
+    }
 }

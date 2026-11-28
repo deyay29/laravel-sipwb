@@ -13,8 +13,9 @@
     |--------------------------------------------------------------------------
     */
 
-    // Gambar utama
-    $posterVideo = App\Support\Media::url($topik->gambar_utama);
+    // Gambar utama (konsisten dengan kartu beranda & daftar sejarah)
+    $fotoUtamaSejarah = $topik->fotoUtama();
+    $posterVideo = App\Support\Media::url($fotoUtamaSejarah);
 
     // Flipbook digital
     $flipbookRaw = trim((string) ($topik->notebook ?? ''));
@@ -128,7 +129,7 @@
         <aside class="space-y-4 lg:col-span-2">
 
             <x-public.media
-                :src="$topik->gambar_utama"
+                :src="$fotoUtamaSejarah"
                 :alt="$topik->judul_topik"
                 icon="fa-landmark"
                 tone="violet"
@@ -396,14 +397,15 @@
     {{-- SEJARAH TERKAIT --}}
     @php
 
-        $terkait = \App\Models\Sejarah::where(
-            'id_sejarah',
-            '!=',
-            $topik->id_sejarah
-        )
-        ->inRandomOrder()
-        ->take(3)
-        ->get();
+        $terkait = \App\Models\Sejarah::with('babs')
+            ->where(
+                'id_sejarah',
+                '!=',
+                $topik->id_sejarah
+            )
+            ->inRandomOrder()
+            ->take(3)
+            ->get();
 
     @endphp
 
@@ -423,7 +425,7 @@
                        class="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md transition hover:shadow-xl">
 
                         <x-public.media
-                            :src="$item->gambar_utama"
+                            :src="$item->fotoUtama()"
                             :alt="$item->judul_topik"
                             icon="fa-landmark"
                             tone="violet"

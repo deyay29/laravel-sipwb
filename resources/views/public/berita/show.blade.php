@@ -175,9 +175,9 @@
     </div>
 
     {{-- Gambar utama artikel --}}
-    @if ($berita->gambar)
+    @if ($berita->fotoUtama())
         <x-public.media
-            :src="$berita->gambar"
+            :src="$berita->fotoUtama()"
             :alt="$berita->judul"
             icon="fa-newspaper"
             tone="brand"
@@ -245,7 +245,7 @@
                     <a href="{{ route('public.berita.show', $item) }}"
                        class="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_2px_16px_rgba(15,23,42,0.06)] transition hover:shadow-[0_12px_32px_rgba(15,23,42,0.10)]">
                         <x-public.media
-                            :src="$item->gambar"
+                            :src="$item->fotoUtama()"
                             alt="{{ $item->judul }}"
                             icon="fa-newspaper"
                             tone="brand"

@@ -40,9 +40,9 @@ class PublicController extends Controller
             // satu query. Tanpa itu, tiap baris di dalam loop view akan
             // memicu query tersendiri (N+1) dan halaman makin lama saat data
             // bertambah banyak.
-            'wisatas' => Wisata::latest()->take(4)->get(),
+            'wisatas' => Wisata::with('fotos')->latest()->take(4)->get(),
             'beritas' => Berita::with('reaksi')->latest('tanggal')->take(4)->get(),
-            'sejarahs' => Sejarah::withCount('babs')->latest()->take(4)->get(),
+            'sejarahs' => Sejarah::with('babs')->withCount('babs')->latest()->take(4)->get(),
             'kuliners' => $this->rekomendasiKuliner($suhuKategori),
 
             'weather' => $weather,
@@ -81,6 +81,7 @@ class PublicController extends Controller
         ];
 
         $rekomendasi = Kuliner::aktif()
+            ->with('fotos')
             ->where('kategori_suhu', $suhuKategori)
             ->get()
             ->sortBy(fn (Kuliner $kuliner) => $kuliner->distanceFrom($pusat['latitude'], $pusat['longitude']) ?? PHP_FLOAT_MAX)
@@ -92,6 +93,7 @@ class PublicController extends Controller
         }
 
         $pelengkap = Kuliner::aktif()
+            ->with('fotos')
             ->when(
                 $rekomendasi->isNotEmpty(),
                 fn ($query) => $query->whereNotIn('id_kuliner', $rekomendasi->modelKeys())
@@ -259,7 +261,7 @@ class PublicController extends Controller
                 ? $request->suhu
                 : $suhuRekomendasi;
 
-        $query = Kuliner::aktif()->withCount('fotos');
+        $query = Kuliner::aktif()->with('fotos')->withCount('fotos');
 
         // Filter hanya dipakai bila memang ada nilainya di query string,
         // supaya halaman tanpa filter tetap menampilkan semua kuliner.
@@ -309,6 +311,8 @@ class PublicController extends Controller
     public function kulinerShow(Kuliner $kuliner): View
     {
         abort_unless($kuliner->status === Kuliner::STATUS_AKTIF, 404);
+
+        $kuliner->load('fotos');
 
         return view('public.kuliner.show', compact('kuliner'));
     }
@@ -370,7 +374,7 @@ class PublicController extends Controller
 
     public function wisata(Request $request): View
     {
-        $query = Wisata::latest();
+        $query = Wisata::with('fotos')->withCount('fotos')->latest();
 
         if ($request->filled('q')) {
             $q = $request->q;
@@ -424,6 +428,8 @@ class PublicController extends Controller
 
     public function wisataShow(Wisata $wisata): View
     {
+        $wisata->load('fotos');
+
         // Paket anggaran ikut dikirim supaya section Smart Budget bisa
         // ditampilkan di dalam halaman detail (anchor #smart-budget).
         $pakets = SmartBudgetPaket::orderBy('total_estimasi')->get();
@@ -445,14 +451,16 @@ class PublicController extends Controller
     public function sejarah(): View
     {
         // withCount('babs') mengisi $topik->babs_count yang dipakai badge
-        // "3 bab" di view, tanpa query tambahan per topik.
-        $sejarahs = Sejarah::withCount('babs')->latest()->paginate(10);
+        // "3 bab" di view, dan with('babs') dipakai sebagai fallback foto utama
+        // bila gambar_utama belum diisi, tanpa query tambahan per topik.
+        $sejarahs = Sejarah::with('babs')->withCount('babs')->latest()->paginate(10);
 
         return view('public.sejarah.index', compact('sejarahs'));
     }
 
     public function sejarahShow(Sejarah $topik): View
     {
+        $topik->load('babs');
         $babs = $topik->babs;
 
         return view('public.sejarah.show', compact('topik', 'babs'));
