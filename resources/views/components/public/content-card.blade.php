@@ -62,9 +62,17 @@
     ][$variant] ?? 'border-slate-100';
 @endphp
 
-{{-- Class digabung dalam satu @class supaya tidak ada atribut class ganda --}}
+{{--
+    Class digabung dalam satu @class supaya tidak ada atribut class ganda.
+    Kalau ada $href, satu-satu area kartu (gambar + judul) dibungkus <a>
+    dengan ::after yang menutupi seluruh kartu. Jadi klik di gambar,
+    judul, atau area kosong mana pun langsung menuju halaman detail,
+    tanpa perlu elemen <a> bersarang (HTML invalid).
+--}}
 <article @class([
-    'group flex h-full flex-col overflow-hidden rounded-2xl border shadow-[0_2px_16px_rgba(15,23,42,0.06)] transition hover:shadow-[0_12px_32px_rgba(15,23,42,0.12)]',
+    'group relative flex h-full flex-col overflow-hidden rounded-2xl border shadow-[0_2px_16px_rgba(15,23,42,0.06)] transition',
+    'hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(15,23,42,0.12)]',
+    'cursor-pointer' => (bool) $href,
     'border-white/10 bg-transparent' => $variant === 'dark',
     'border-slate-200 bg-white' => $variant !== 'dark',
     $attributes->get('class'),
@@ -79,6 +87,13 @@
         class="transition duration-500 group-hover:scale-105"
     />
 
+    {{-- Satu link transparan menutupi seluruh kartu -> semua area bisa diklik --}}
+    @if ($href)
+        <a href="{{ $href }}" class="absolute inset-0 z-10">
+            <span class="sr-only">Lihat detail {{ $title }}</span>
+        </a>
+    @endif
+
     <div class="flex flex-1 flex-col p-5 {{ $body }}">
         {{-- Badge: tingginya dijaga agar judul selalu mulai di baris yang sama --}}
         <div class="mb-2.5 h-6">
@@ -89,12 +104,10 @@
             @endif
         </div>
 
+        {{-- Judul teks biasa; klikannya ditangani link overlay di atas.
+         Dibuat <h3> tanpa <a> supaya tidak ada anchor bersarang. --}}
         <h3 class="line-clamp-2 font-display text-base font-bold leading-snug transition {{ $titleColor }}">
-            @if ($href)
-                <a href="{{ $href }}">{{ $title }}</a>
-            @else
-                {{ $title }}
-            @endif
+            {{ $title }}
         </h3>
 
         @if ($summary)
@@ -103,21 +116,27 @@
 
         {{-- mt-auto: baris bawah menempel ke dasar kartu -> tinggi kartu serata --}}
         <div class="mt-auto pt-4">
-            <div class="flex items-center justify-between gap-3 border-t pt-4 {{ $divider }}">
-                <div class="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-1 text-[11px] {{ $mutedColor }}">
+            {{-- flex-wrap: kalau meta (mis. alamat) panjang, ia turun ke baris
+                 sendiri dan tidak lagi menekan harga. --}}
+            <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-t pt-4 {{ $divider }}">
+                <div class="flex min-w-0 flex-1 flex-wrap items-center gap-x-4 gap-y-1 text-[11px] {{ $mutedColor }}">
                     @foreach ($meta as [$icon, $value])
-                        <span class="inline-flex items-center gap-1.5">
+                        {{-- min-w-0 + flex-wrap supaya alamat panjang turun
+                             ke baris berikutnya, bukan terpotong. --}}
+                        <span class="inline-flex min-w-0 max-w-full basis-full items-start gap-1.5 sm:basis-auto">
                             @if ($icon)
-                                <i class="fas {{ $icon }} text-[10px]"></i>
+                                <i class="fas {{ $icon }} mt-[1px] shrink-0 text-[10px]"></i>
                             @endif
-                            <span class="truncate">{{ $value }}</span>
+                            <span class="min-w-0 break-words hyphens-auto">{{ $value }}</span>
                         </span>
                     @endforeach
                 </div>
 
+                {{-- Harga: shrink-0 supaya tidak pernah terpotong; ml-auto
+                     menjaga ia tetap rata kanan saat meta turun ke baris baru. --}}
                 @if ($note)
                     <span @class([
-                        'shrink-0 font-display text-sm font-extrabold',
+                        'ml-auto shrink-0 font-display text-sm font-extrabold',
                         'text-brand-700' => $variant === 'light',
                         'text-white' => $variant === 'brand',
                         'text-accent-400' => $variant === 'dark',

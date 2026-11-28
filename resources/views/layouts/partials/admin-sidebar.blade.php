@@ -1,9 +1,7 @@
 <aside class="admin-sidebar fixed inset-y-0 left-0 z-50 hidden w-[220px] flex-col overflow-y-auto bg-navy-800 text-white md:flex">
 
     <div class="flex items-center gap-3 border-b border-white/10 px-[18px] py-5">
-        <span class="grid h-10 w-10 shrink-0 place-items-center rounded-[10px] bg-accent-500 text-lg text-white">
-            <i class="fas fa-city"></i>
-        </span>
+        <img src="{{ asset('images/logo.png') }}" alt="Bandung Info Center" class="h-10 w-auto shrink-0">
         <div>
             <h3 class="text-[13px] font-bold leading-tight text-white">Bandung Info Center</h3>
             <span class="text-[10px] font-medium uppercase tracking-[1px] text-accent-500">Panel Admin</span>

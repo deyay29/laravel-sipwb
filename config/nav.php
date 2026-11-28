@@ -11,41 +11,43 @@ return [
             'label' => 'Beranda',
             'route' => 'home',
             'pattern' => 'home',
+            'icon' => 'fa-house',
         ],
         [
             'label' => 'Berita',
             'route' => 'public.berita',
             'pattern' => 'public.berita*',
+            'icon' => 'fa-newspaper',
         ],
         [
             'label' => 'Wisata',
             'route' => 'public.wisata',
             'pattern' => 'public.wisata*',
+            'icon' => 'fa-mountain-sun',
         ],
         [
             'label' => 'Kuliner',
             'route' => 'public.kuliner',
             'pattern' => 'public.kuliner*',
+            'icon' => 'fa-utensils',
         ],
         [
             'label' => 'Sejarah',
             'route' => 'public.sejarah',
             'pattern' => 'public.sejarah*',
+            'icon' => 'fa-landmark',
         ],
         [
             'label' => 'Galeri',
             'route' => 'public.galeri',
             'pattern' => 'public.galeri*',
-        ],
-        [
-            'label' => 'Smart Budget',
-            'route' => 'public.smart-budget',
-            'pattern' => 'public.smart-budget*',
+            'icon' => 'fa-images',
         ],
         [
             'label' => 'Kontak',
             'route' => 'public.kontak',
             'pattern' => 'public.kontak*',
+            'icon' => 'fa-envelope',
         ],
     ],
 
@@ -88,6 +90,18 @@ return [
             'route' => 'admin.galeri.index',
             'pattern' => 'admin.galeri.*',
             'icon' => 'fa-images',
+        ],
+        [
+            'label' => 'Smart Budget',
+            'route' => 'admin.smart-budget.index',
+            'pattern' => 'admin.smart-budget.*',
+            'icon' => 'fa-calculator',
+        ],
+        [
+            'label' => 'Kritik & Masukan',
+            'route' => 'admin.contact.messages.index',
+            'pattern' => 'admin.contact.messages.*',
+            'icon' => 'fa-comment-sms',
         ],
     ],
 

@@ -19,6 +19,16 @@
  // Rekomendasi kategori kuliner berdasarkan suhu saat ini.
  $tempCategory = $temp !== null && $temp >= 27 ? 'Menyegarkan' : 'Menghangatkan';
 
+ // Warna teks status/kategori kartu konten terbaru.
+ $metaColors = [
+ 'emerald' => 'text-emerald-600',
+ 'sky' => 'text-sky-600',
+ 'violet' => 'text-violet-600',
+ 'rose' => 'text-rose-600',
+ 'amber' => 'text-amber-600',
+ 'slate' => 'text-slate-400',
+ ];
+
  $stats = [
  [
  'label' => 'Total Kuliner',
@@ -73,12 +83,6 @@
  Ringkasan konten portal Bandung Info Center per {{ now()->format('d F Y') }}.
  </p>
  </div>
-
- <a href="{{ route('admin.kuliner.index') }}"
- class="inline-flex items-center gap-2 rounded-[14px] bg-gradient-to-br from-navy-800 to-brand-600 px-6 py-3 font-display text-sm font-semibold text-white shadow-[0_4px_18px_rgba(26,42,108,0.3)] transition hover:shadow-[0_10px_28px_rgba(26,42,108,0.4)]">
- Kelola Kuliner
- <i class="fas fa-arrow-right text-xs"></i>
- </a>
 </div>
 
 {{-- ===== Kartu cuaca ===== --}}
@@ -161,6 +165,57 @@
  </a>
  @endforeach
 </section>
+
+{{-- ===== Konten terbaru per fitur ===== --}}
+@foreach ($recentSections as $section)
+    <section class="mt-6 rounded-[14px] border border-slate-200 bg-white p-6 shadow-[0_2px_16px_rgba(26,42,108,0.08)]">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+                <h2 class="font-display text-sm font-bold text-slate-800">{{ $section['title'] }}</h2>
+                <p class="mt-1 text-xs text-slate-500">{{ $section['description'] }}</p>
+            </div>
+
+            <a href="{{ $section['indexUrl'] }}"
+               class="inline-flex items-center gap-1.5 font-display text-xs font-semibold text-brand-700 transition hover:text-brand-800">
+                Lihat semua <i class="fas fa-arrow-right text-[10px]"></i>
+            </a>
+        </div>
+
+        <div class="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-6">
+            @forelse ($section['items'] as $item)
+                <a href="{{ $item['url'] }}"
+                   class="group overflow-hidden rounded-xl border border-slate-200 transition hover:border-brand-500 hover:shadow-[0_8px_20px_rgba(26,42,108,0.12)]">
+                    <div class="relative">
+                        <x-public.media :src="$item['image']" :alt="$item['title']" :icon="$section['icon']"
+                            :tone="$section['tone']" ratio="h-28" class="transition duration-500 group-hover:scale-105" />
+
+                        @if ($item['badge'] !== null)
+                            <span class="absolute bottom-2 right-2 inline-flex items-center gap-1 rounded-full bg-navy-900/80 px-2 py-0.5 text-[10px] font-bold text-white backdrop-blur">
+                                <i class="fas {{ $item['badgeIcon'] }} text-[9px]"></i> {{ $item['badge'] }}
+                            </span>
+                        @endif
+                    </div>
+
+                    <div class="p-3">
+                        <p class="line-clamp-1 font-display text-xs font-bold text-slate-800">{{ $item['title'] }}</p>
+                        <p @class([
+                            'mt-1 flex min-w-0 items-center gap-1 text-[10px] font-semibold',
+                            $metaColors[$item['metaTone']] ?? $metaColors['slate'],
+                        ])>
+                            <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-current"></span>
+                            <span class="truncate">{{ $item['meta'] }}</span>
+                        </p>
+                    </div>
+                </a>
+            @empty
+                <div class="col-span-full rounded-xl border border-dashed border-slate-200 p-6 text-center text-sm text-slate-400">
+                    {{ $section['empty'] }}
+                    <a href="{{ $section['createUrl'] }}" class="font-semibold text-brand-700">Tambah sekarang</a>.
+                </div>
+            @endforelse
+        </div>
+    </section>
+@endforeach
 
 {{-- ===== Pintasan ===== --}}
 <section class="mt-6 grid gap-4 md:grid-cols-2">

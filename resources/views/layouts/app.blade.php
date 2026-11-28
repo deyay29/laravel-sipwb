@@ -13,7 +13,7 @@
     @stack('head')
 </head>
 
-<body class="flex min-h-screen flex-col bg-slate-50 font-sans text-slate-900 antialiased">
+<body class="flex min-h-screen flex-col bg-slate-50 font-sans text-slate-900 antialiased pb-20 lg:pb-0">
     @include('layouts.partials.navbar')
 
     <main class="flex-1">

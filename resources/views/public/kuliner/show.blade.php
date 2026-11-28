@@ -4,195 +4,234 @@
 @section('description', Str::limit(strip_tags($kuliner->deskripsi), 160))
 
 @section('content')
-@php $menghangatkan = $kuliner->kategori_suhu === \App\Models\Kuliner::SUHU_MENGHANGATKAN; @endphp
+    @php
+        $menghangatkan = $kuliner->kategori_suhu === \App\Models\Kuliner::SUHU_MENGHANGATKAN;
 
-<x-public.page-hero
- :title="$kuliner->nama_kuliner"
- :image="$kuliner->foto"
- :breadcrumb="[
- 'Beranda' => route('home'),
- 'Kuliner' => route('public.kuliner'),
- Str::limit($kuliner->nama_kuliner, 40) => null,
- ]"
-/>
+        $isSegalaSuasana = $kuliner->kategori_suhu === \App\Models\Kuliner::SUHU_SEGALA_SUASANA;
 
-<section class="mx-auto max-w-7xl px-4 py-12 sm:px-6">
- <a href="{{ route('public.kuliner') }}"
- class="mb-8 inline-flex items-center gap-2 font-display text-sm font-semibold text-brand-700 transition hover:text-brand-800">
- <i class="fas fa-arrow-left text-xs"></i>
- Kembali ke daftar kuliner
- </a>
+        /*
+         * Foto untuk slider: semua foto kuliner (sampul + album yang diunggah
+         * lewat admin), lalu dilengkapi foto galeri kategori "Kuliner".
+         * Kalau hanya ada satu, komponen merender gambar tunggal tanpa panah.
+         */
+        $fotoSlider = collect($kuliner->semuaFoto())
+            ->map(fn ($src) => ['src' => $src, 'alt' => $kuliner->nama_kuliner])
+            ->merge(
+                App\Models\Galeri::query()
+                    ->where('kategori_objek', 'like', '%Kuliner%')
+                    ->get()
+                    ->map(fn($g) => ['src' => $g->file_gambar, 'alt' => $g->judul]),
+            )
+            ->unique('src')
+            ->values()
+            ->all();
 
- <div class="grid gap-10 lg:grid-cols-5">
- {{-- Kolom kiri --}}
- <aside class="space-y-5 lg:col-span-2">
- <x-public.media
- :src="$kuliner->foto"
- :alt="$kuliner->nama_kuliner"
- icon="fa-utensils"
- tone="amber"
- ratio="aspect-[4/3]"
- class="rounded-2xl border-4 border-brand-600 shadow-[0_10px_28px_rgba(37,99,235,0.22)]"
- />
+        // Peta: dari link/koordinat bila ada, fallback ke alamat teks.
+        $petaUrl = App\Support\MapEmbed::toEmbedUrl($kuliner->alamat_lengkap);
+    @endphp
 
- @if ($kuliner->alamat_lengkap)
- <div class="relative overflow-hidden rounded-2xl border border-slate-200">
- <div class="grid h-52 place-items-center bg-gradient-to-br from-slate-100 to-slate-200">
- <i class="fas fa-map-location-dot text-4xl text-slate-300"></i>
- </div>
+    <x-public.page-hero :title="$kuliner->nama_kuliner" :breadcrumb="[
+        'Beranda' => route('home'),
+        'Kuliner' => route('public.kuliner'),
+        Str::limit($kuliner->nama_kuliner, 40) => null,
+    ]" />
 
- <a href="https://maps.google.com/?q={{ urlencode($kuliner->alamat_lengkap) }}"
- target="_blank"
- rel="noopener"
- class="absolute bottom-4 left-1/2 inline-flex -translate-x-1/2 items-center gap-2 whitespace-nowrap rounded-xl bg-brand-600 px-5 py-2.5 font-display text-sm font-semibold text-white shadow-lg transition hover:bg-brand-700">
- <i class="fas fa-location-dot text-xs"></i>
- Buka Maps
- </a>
- </div>
- @endif
+    <section class="mx-auto max-w-[1400px] px-4 py-12 sm:px-6">
+        <div class="mb-8 flex flex-wrap items-center justify-between gap-4">
+            <a href="{{ route('public.kuliner') }}"
+                class="inline-flex items-center gap-2 font-display text-sm font-semibold text-brand-700 transition hover:text-brand-800">
+                <i class="fas fa-arrow-left text-xs"></i>
+                Kembali ke daftar kuliner
+            </a>
 
- @if ($kuliner->kategori_suhu)
- <div @class([
- 'flex items-start gap-3 rounded-2xl border p-5',
- 'border-rose-200 bg-rose-50' => $menghangatkan,
- 'border-sky-200 bg-sky-50' => ! $menghangatkan,
- ])>
- <i @class([
- 'mt-0.5',
- 'fas fa-fire text-rose-500' => $menghangatkan,
- 'fas fa-snowflake text-sky-500' => ! $menghangatkan,
- ])></i>
- <div>
- <p @class([
- 'font-display text-sm font-bold',
- 'text-rose-900' => $menghangatkan,
- 'text-sky-900' => ! $menghangatkan,
- ])>
- Kategori Suhu: {{ $kuliner->kategori_suhu }}
- </p>
- <p @class([
- 'mt-1 text-xs leading-relaxed',
- 'text-rose-800' => $menghangatkan,
- 'text-sky-800' => ! $menghangatkan,
- ])>
- @if ($menghangatkan)
- Cocok saat cuaca dingin atau ketika dibutuhkan.
- @else
- Cocok saat cuaca panas atau ketika dibutuhkan.
- @endif
- </p>
- </div>
- </div>
- @endif
- </aside>
+            <x-public.share-buttons :title="$kuliner->nama_kuliner" />
+        </div>
 
- {{-- Kolom kanan --}}
- <div class="lg:col-span-3">
- {{-- Statistik --}}
- <div class="mb-8 flex flex-wrap items-center gap-x-8 gap-y-3 border-b border-slate-200 pb-6 text-sm text-slate-500">
- <span class="inline-flex items-center gap-2">
- <i class="fas fa-eye text-brand-500"></i>
- {{ number_format($kuliner->visitor_count ?? 0, 0, ',', '.') }} kali dibaca
- </span>
- <span class="inline-flex items-center gap-2">
- <i class="fas fa-star text-accent-500"></i>
- Rating 4.5
- </span>
- </div>
+        <div class="grid gap-10 lg:grid-cols-5">
+            {{-- Kolom kiri --}}
+            <aside class="space-y-5 lg:col-span-2">
+                <x-public.image-slider :images="$fotoSlider" icon="fa-utensils" tone="amber" ratio="aspect-[4/3]"
+                    class="shadow-[0_4px_20px_rgba(15,23,42,0.10)]" />
 
- {{-- Kartu info --}}
- <div class="grid gap-4 sm:grid-cols-3">
- @foreach ([
- ['icon' => 'fa-location-dot', 'label' => 'Lokasi', 'value' => $kuliner->alamat_lengkap ?? '-'],
- ['icon' => 'fa-clock', 'label' => 'Jam Buka', 'value' => $kuliner->jam_operasional ?? '-'],
- ['icon' => 'fa-phone', 'label' => 'Kontak', 'value' => $kuliner->kontak ?? '-'],
- ] as $info)
- <div class="rounded-2xl border-2 border-navy-700 p-5 text-center">
- <p class="flex items-center justify-center gap-2 font-display text-sm font-bold text-navy-700">
- <i class="fas {{ $info['icon'] }} text-brand-600"></i>
- {{ $info['label'] }}
- </p>
- <p class="mt-2.5 text-xs leading-relaxed text-slate-600">{{ $info['value'] }}</p>
- </div>
- @endforeach
- </div>
+                {{-- Peta: iframe embed resmi Google Maps, tanpa API key. --}}
+                @if ($petaUrl)
+                    <div
+                        class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_2px_16px_rgba(15,23,42,0.06)]">
+                        <iframe src="{{ $petaUrl }}" title="Peta lokasi {{ $kuliner->nama_kuliner }}"
+                            class="h-72 w-full border-0" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+                            allowfullscreen></iframe>
+                    </div>
+                @elseif ($kuliner->alamat_lengkap)
+                    <div class="relative overflow-hidden rounded-2xl border border-slate-200">
+                        <div class="grid h-52 place-items-center bg-gradient-to-br from-slate-100 to-slate-200">
+                            <i class="fas fa-map-location-dot text-4xl text-slate-300"></i>
+                        </div>
 
- {{-- Harga --}}
- @if ($kuliner->harga)
- <div class="mt-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl bg-navy-800 px-6 py-5 text-white">
- <div>
- <p class="text-[11px] uppercase tracking-widest text-white/60">Harga rata-rata</p>
- <p class="mt-1 font-display text-2xl font-extrabold">
- Rp{{ number_format($kuliner->harga, 0, ',', '.') }}
- </p>
- </div>
- <p class="max-w-xs text-xs leading-relaxed text-white/70">
- Harga dapat berubah sewaktu-waktu. Pastikan konfirmasi ke tempat sebelum datang.
- </p>
- </div>
- @endif
+                        <a href="https://maps.google.com/?q={{ urlencode($kuliner->alamat_lengkap) }}" target="_blank"
+                            rel="noopener"
+                            class="absolute bottom-4 left-1/2 inline-flex -translate-x-1/2 items-center gap-2 whitespace-nowrap rounded-xl bg-brand-600 px-5 py-2.5 font-display text-sm font-semibold text-white shadow-lg transition hover:bg-brand-700">
+                            <i class="fas fa-location-dot text-xs"></i>
+                            Buka Maps
+                        </a>
+                    </div>
+                @endif
 
- {{-- Deskripsi --}}
- <h2 class="mt-10 font-display text-2xl font-extrabold text-brand-700">{{ $kuliner->nama_kuliner }}</h2>
+                @if ($kuliner->kategori_suhu)
+                    <div @class([
+                        'flex items-start gap-3 rounded-2xl border p-5',
+                        'border-rose-200 bg-rose-50' => $menghangatkan,
+                        'border-sky-200 bg-sky-50' => ! $menghangatkan && ! $isSegalaSuasana,
+                        'border-slate-200 bg-slate-50' => $isSegalaSuasana,
+                    ])>
+                        <i @class([
+                            'mt-0.5',
+                            'fas fa-fire text-rose-500' => $menghangatkan,
+                            'fas fa-snowflake text-sky-500' => ! $menghangatkan && ! $isSegalaSuasana,
+                            'fas fa-compass text-slate-500' => $isSegalaSuasana,
+                        ])></i>
+                        <div>
+                            <p @class([
+                                'font-display text-sm font-bold',
+                                'text-rose-900' => $menghangatkan,
+                                'text-sky-900' => ! $menghangatkan && ! $isSegalaSuasana,
+                                'text-slate-900' => $isSegalaSuasana,
+                            ])>
+                                Kategori Suhu: {{ $kuliner->kategori_suhu }}
+                            </p>
+                            <p @class([
+                                'mt-1 text-xs leading-relaxed',
+                                'text-rose-800' => $menghangatkan,
+                                'text-sky-800' => ! $menghangatkan && ! $isSegalaSuasana,
+                                'text-slate-800' => $isSegalaSuasana,
+                            ])>
+                                @if ($menghangatkan)
+                                    Cocok saat cuaca dingin atau ketika dibutuhkan.
+                                @elseif ($isSegalaSuasana)
+                                    Cocok untuk suasana apa pun (kategori umum).
+                                @else
+                                    Cocok saat cuaca panas atau ketika dibutuhkan.
+                                @endif
+                            </p>
+                        </div>
+                    </div>
+                @endif
+            </aside>
 
- <div class="mt-4 text-[1.02rem] leading-[1.9] text-slate-700">
- {!! nl2br(e($kuliner->deskripsi)) !!}
- </div>
- </div>
- </div>
+            {{-- Kolom kanan --}}
+            <div class="lg:col-span-3">
+                {{-- Statistik --}}
+                <div
+                    class="mb-8 flex flex-wrap items-center gap-x-8 gap-y-3 border-b border-slate-200 pb-6 text-sm text-slate-500">
+                    <span class="inline-flex items-center gap-2">
+                        <i class="fas fa-eye text-brand-500"></i>
+                        {{ number_format($kuliner->visitor_count ?? 0, 0, ',', '.') }} kali dibaca
+                    </span>
+                </div>
 
- {{-- Kuliner terkait --}}
- @php
- $terkait = \App\Models\Kuliner::aktif()
- ->where('id_kuliner', '!=', $kuliner->id_kuliner)
- ->inRandomOrder()
- ->take(3)
- ->get();
- @endphp
+                {{-- Kartu info --}}
+                <div class="grid gap-4 sm:grid-cols-3">
+                    @foreach ([['icon' => 'fa-location-dot', 'label' => 'Lokasi', 'value' => $kuliner->alamat_lengkap ?? '-'], ['icon' => 'fa-clock', 'label' => 'Jam Buka', 'value' => $kuliner->jam_operasional ?? '-'], ['icon' => 'fa-phone', 'label' => 'Kontak', 'value' => $kuliner->kontak ?? '-']] as $info)
+                        <div class="rounded-2xl border-2 border-navy-700 p-5 text-center">
+                            <p class="flex items-center justify-center gap-2 font-display text-sm font-bold text-navy-700">
+                                <i class="fas {{ $info['icon'] }} text-brand-600"></i>
+                                {{ $info['label'] }}
+                            </p>
+                            <p class="mt-2.5 text-xs leading-relaxed text-slate-600">{{ $info['value'] }}</p>
+                        </div>
+                    @endforeach
+                </div>
 
- @if ($terkait->isNotEmpty())
- <div class="mt-16">
- <h2 class="font-display text-xl font-extrabold text-slate-900">Kuliner Terkait Lainnya</h2>
+                {{-- Harga --}}
+                @if ($kuliner->hargaTampilan())
+                    <div
+                        class="mt-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl bg-navy-800 px-6 py-5 text-white">
+                        <div>
+                            <p class="text-[11px] uppercase tracking-widest text-white/60">{{ $kuliner->adaHargaRange() ? 'Kisaran Harga' : 'Harga' }}</p>
+                            <p class="mt-1 font-display text-2xl font-extrabold">
+                                {{ $kuliner->hargaTampilan() }}
+                            </p>
+                        </div>
+                        <p class="max-w-xs text-xs leading-relaxed text-white/70">
+                            Harga dapat berubah sewaktu-waktu. Pastikan konfirmasi ke tempat sebelum datang.
+                        </p>
+                    </div>
+                @endif
 
- <div class="mt-5 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
- @foreach ($terkait as $item)
- <a href="{{ route('public.kuliner.show', $item) }}"
- class="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_2px_16px_rgba(15,23,42,0.06)] transition hover:shadow-[0_12px_32px_rgba(15,23,42,0.12)]">
- <x-public.media
- :src="$item->foto"
- :alt="$item->nama_kuliner"
- icon="fa-utensils"
- tone="amber"
- ratio="h-48"
- class="transition duration-500 group-hover:scale-105"
- />
+                {{-- Deskripsi --}}
+                <h2 class="mt-10 font-display text-2xl font-extrabold text-brand-700">{{ $kuliner->nama_kuliner }}</h2>
 
- <div class="bg-brand-600 p-5 text-white">
- <div class="flex items-start justify-between gap-3">
- <p class="font-display text-base font-bold">{{ $item->nama_kuliner }}</p>
- <span class="inline-flex shrink-0 items-center gap-1 text-xs font-bold">
- <i class="fas fa-star text-accent-400 text-[10px]"></i>
- 4.7
- </span>
- </div>
+                <div class="mt-4 text-[1.02rem] leading-[1.9] text-slate-700">
+                    {!! nl2br(e($kuliner->deskripsi)) !!}
+                </div>
 
- <p class="mt-2.5 text-xs text-white/75">
- <i class="fas fa-location-dot"></i>
- {{ Str::limit($item->alamat_lengkap ?? 'Bandung', 35) }}
- </p>
- <p class="mt-1 text-xs text-white/75">
- <i class="far fa-clock"></i>
- {{ $item->jam_operasional ?? '-' }}
- </p>
+                {{-- Galeri: semua foto yang diunggah admin, ditampilkan sekaligus. --}}
+                @if (count($fotoSlider) > 1)
+                    <div class="mt-10">
+                        <h2 class="font-display text-xl font-extrabold text-slate-900">Galeri Foto</h2>
+                        <p class="mt-1 text-sm text-slate-500">{{ count($fotoSlider) }} foto tersedia.</p>
 
- <span class="mt-4 inline-flex items-center gap-1.5 font-display text-xs font-bold">
- Lihat Detail <i class="fas fa-arrow-right text-[10px] transition"></i>
- </span>
- </div>
- </a>
- @endforeach
- </div>
- </div>
- @endif
-</section>
+                        <div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+                            @foreach ($fotoSlider as $foto)
+                                @php
+                                    $fotoUrl = App\Support\Media::url($foto['src'] ?? null);
+                                @endphp
+
+                                @if ($fotoUrl)
+                                    <figure class="overflow-hidden rounded-xl border border-slate-200 bg-white">
+                                        <img src="{{ $fotoUrl }}"
+                                             alt="{{ $foto['alt'] ?? $kuliner->nama_kuliner }}"
+                                             loading="lazy"
+                                             decoding="async"
+                                             class="aspect-[4/3] w-full object-cover transition duration-500 hover:scale-105">
+                                    </figure>
+                                @endif
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+            </div>
+        </div>
+
+        {{-- Kuliner terkait --}}
+        @php
+            $terkait = \App\Models\Kuliner::aktif()
+                ->where('id_kuliner', '!=', $kuliner->id_kuliner)
+                ->inRandomOrder()
+                ->take(3)
+                ->get();
+        @endphp
+
+        @if ($terkait->isNotEmpty())
+            <div class="mt-16">
+                <h2 class="font-display text-xl font-extrabold text-slate-900">Kuliner Terkait Lainnya</h2>
+
+                <div class="mt-5 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    @foreach ($terkait as $item)
+                        <a href="{{ route('public.kuliner.show', $item) }}"
+                            class="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_2px_16px_rgba(15,23,42,0.06)] transition hover:shadow-[0_12px_32px_rgba(15,23,42,0.12)]">
+                            <x-public.media :src="$item->foto" :alt="$item->nama_kuliner" icon="fa-utensils" tone="amber"
+                                ratio="h-48" class="transition duration-500 group-hover:scale-105" />
+
+                            <div class="bg-brand-600 p-5 text-white">
+                                <p class="font-display text-base font-bold">{{ $item->nama_kuliner }}</p>
+
+                                <p class="mt-2.5 text-xs text-white/75">
+                                    <i class="fas fa-location-dot"></i>
+                                    {{ Str::limit($item->alamat_lengkap ?? 'Bandung', 35) }}
+                                </p>
+                                <p class="mt-1 text-xs text-white/75">
+                                    <i class="far fa-clock"></i>
+                                    {{ $item->jam_operasional ?? '-' }}
+                                </p>
+
+                                <span class="mt-4 inline-flex items-center gap-1.5 font-display text-xs font-bold">
+                                    Lihat Detail <i class="fas fa-arrow-right text-[10px] transition"></i>
+                                </span>
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+    </section>
 @endsection

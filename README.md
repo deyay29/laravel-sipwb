@@ -43,11 +43,11 @@ untuk menambah, mengubah, dan menghapus konten.
 | 🏠 **Beranda** | Cuaca Kota Bandung, 5 kategori utama, rekomendasi kuliner sesuai suhu |
 | 📰 **Berita** | Artikel + audio + tombol reaksi (like / apresiasi / cerah) |
 | 🏞️ **Wisata** | Destinasi + lokasi + harga tiket, detail per tempat |
-| 🍜 **Kuliner** | Kuliner khas dengan kategori suhu (menghangatkan / menyegarkan), difilter otomatis sesuai cuaca |
+| 🍜 **Kuliner** | Kuliner khas dengan kategori suhu (menghangatkan / menyegarkan / segala suasana), titik lokasi (latitude/longitude) + radius wilayah, filter jarak terdekat & radius (km), serta filter Family & Kids (ramah keluarga & anak) |
 | 🏛️ **Sejarah** | Topik sejarah yang dipecah menjadi beberapa bab (storytelling) |
 | 🖼️ **Galeri** | Repository foto dengan filter kategori |
 | 💰 **Smart Budget** | Contoh paket anggaran perjalanan |
-| 📞 **Kontak** | Alamat, telepon, email, media sosial, peta |
+| 📞 **Kontak** | Alamat, telepon, email, media sosial, peta, + form kritik/saran/masukan anonim |
 | 🔐 **Panel Admin** | CRUD konten + dashboard statistik + cuaca |
 
 ---
@@ -494,6 +494,7 @@ layouts/app.blade.php  →  membungkus dengan navbar & footer
 | `/galeri` | Galeri foto |
 | `/smart-budget` | Paket anggaran |
 | `/kontak` | Kontak & peta |
+| `/kontak/kirim` | Kirim kritik, saran, atau masukan (anonim) |
 | `/login` | Login admin (satu-satunya halaman auth) |
 
 ### Panel Admin (`/admin/*`)
@@ -507,6 +508,7 @@ layouts/app.blade.php  →  membungkus dengan navbar & footer
 | `/admin/sejarah` | Kelola topik sejarah |
 | `/admin/galeri` | Kelola galeri foto |
 | `/admin/contact` | Kelola data kontak |
+| `/admin/contact/messages` | Daftar kritik, saran, atau masukan pengunjung |
 
 > Semua URL admin otomatis memakai **slug**, bukan angka. Jadi kalau slug berita
 > diubah, URL lamanya ikut berubah.
@@ -529,6 +531,7 @@ layouts/app.blade.php  →  membungkus dengan navbar & footer
 | `galeri` | Foto galeri |
 | `smart_budget_paket` | Paket anggaran |
 | `contacts` | Data kontak (satu baris) |
+| `contact_messages` | Kritik, saran, atau masukan anonim dari pengunjung |
 
 ### Relasi Antar Tabel
 

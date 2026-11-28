@@ -49,7 +49,7 @@
         <a href="{{ $action }}"
            @class([
                'inline-flex items-center gap-2 rounded-full px-6 py-3 font-display text-sm font-semibold transition',
-               'bg-brand-600 text-white shadow-[0_6px_18px_rgba(37,99,235,0.3)] hover:bg-brand-700' => $tone === 'light',
+               'bg-brand-600 text-white shadow-[0_6px_18px_rgba(37,65,160,0.32)] hover:bg-brand-700' => $tone === 'light',
                'border border-white/30 bg-white/10 text-white backdrop-blur hover:bg-white/20' => $tone === 'dark',
            ])>
             {{ $actionLabel }}

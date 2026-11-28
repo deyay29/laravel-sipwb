@@ -10,7 +10,7 @@
  :breadcrumb="['Beranda' => route('home'), 'Sejarah' => null]"
 />
 
-<section class="mx-auto max-w-7xl px-4 py-14 sm:px-6">
+<section class="mx-auto max-w-[1400px] px-4 py-14 sm:px-6">
  <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
  @forelse ($sejarahs as $topik)
  <article class="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_2px_16px_rgba(15,23,42,0.06)] transition hover:shadow-[0_12px_32px_rgba(15,23,42,0.10)]">
@@ -27,6 +27,22 @@
  <span class="absolute left-4 top-4 rounded-full bg-slate-900/70 px-3 py-1 text-[11px] font-bold text-white backdrop-blur">
  {{ $topik->babs_count }} bab
  </span>
+
+ @if ($topik->video_storytelling || $topik->notebook)
+ <span class="absolute bottom-3 left-4 flex flex-wrap gap-1.5">
+ @if ($topik->video_storytelling)
+ <span class="inline-flex items-center gap-1 rounded-full bg-violet-600/90 px-2.5 py-1 text-[10px] font-bold text-white backdrop-blur">
+ <i class="fas fa-video text-[9px]"></i> Video
+ </span>
+ @endif
+
+  @if ($topik->notebook)
+  <span class="inline-flex items-center gap-1 rounded-full bg-brand-600/90 px-2.5 py-1 text-[10px] font-bold text-white backdrop-blur">
+  <i class="fas fa-book-open text-[9px]"></i> Flipbook
+  </span>
+  @endif
+ </span>
+ @endif
  </a>
 
  <div class="flex flex-1 flex-col p-6">

@@ -10,7 +10,7 @@
  :breadcrumb="['Beranda' => route('home'), 'Berita' => null]"
 />
 
-<section class="mx-auto max-w-7xl px-4 py-14 sm:px-6">
+<section class="mx-auto max-w-[1400px] px-4 py-14 sm:px-6">
  <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
  @forelse ($beritas as $berita)
  <article class="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_2px_16px_rgba(15,23,42,0.06)] transition hover:shadow-[0_12px_32px_rgba(15,23,42,0.10)]">
@@ -24,11 +24,12 @@
  class="w-full object-cover transition duration-500 group-hover:scale-105"
  />
 
- @if ($berita->kategori)
+ @php
+     $kat = strtolower($berita->kategori ?? '') === 'sejarah' ? 'Berita' : ($berita->kategori ?: 'Berita');
+ @endphp
  <span class="absolute left-4 top-4 rounded-full bg-slate-900/70 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-white backdrop-blur">
- {{ $berita->kategori }}
+     {{ $kat }}
  </span>
- @endif
  </a>
 
  <div class="flex flex-1 flex-col p-6">
