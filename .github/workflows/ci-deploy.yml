@@ -26,6 +26,20 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: SIPWB_testing
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -u root -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
     steps:
       - name: Ambil kode
         uses: actions/checkout@v4
@@ -55,16 +69,6 @@ jobs:
       - name: Bikin APP_KEY sementara (dipakai pengujian)
         run: cp .env.example .env && php artisan key:generate
 
-      - name: Pastikan database pengujian ada
-        env:
-          MYSQL_PWD: ${{ secrets.TEST_DB_PASSWORD }}
-        run: |
-          # GitHub Actions menyediakan MySQL di localhost:3306, jadi cukup
-          # membuat database pengujian. Ini TIDAK menyentuh database produksi.
-          mysql -h 127.0.0.1 -P 3306 -u root -e \
-            "CREATE DATABASE IF NOT EXISTS SIPWB_testing CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-          echo "Database pengujian siap."
-
       - name: Cek format kode (Pint)
         run: ./vendor/bin/pint --test
 
@@ -81,7 +85,7 @@ jobs:
           DB_PORT: '3306'
           DB_DATABASE: SIPWB_testing
           DB_USERNAME: root
-          DB_PASSWORD: ${{ secrets.TEST_DB_PASSWORD }}
+          DB_PASSWORD: root
         run: php artisan test
 
   # ================================================================
